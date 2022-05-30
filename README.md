@@ -16,6 +16,5 @@ void greet() {
 
 
 <p align="center"> 
-<a href="https://twitter.com/lol_kamir" target="blank"><img align="center" src=https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/twitter.svg alt="lol_kamir" height="25" width="25" /></a>
-<a href="https://www.xing.com/profile/Amir_Mansour" target="blank"><img align="center" src=https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/xing.svg alt="https://www.xing.com/profile/Amir_Mansour" height="25" width="25" /></a>    
+<a href="https://twitter.com/lol_kamir" target="blank"><img align="center" src=https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/twitter.svg alt="lol_kamir" height="25" width="25" /></a> 
 </p>
