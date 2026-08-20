@@ -59,6 +59,13 @@ await schritt("stapel-ablehnung", async () => {
   await seite.waitForTimeout(800);
 });
 
+await schritt("freihaendig", async () => {
+  await seite.getByRole("button", { name: /Freihändig/ }).click();
+  await seite.waitForTimeout(1200);
+  await seite.keyboard.press("Escape");
+  await seite.waitForTimeout(400);
+});
+
 await schritt("palette", async () => {
   await seite.keyboard.press("Escape");
   await seite.keyboard.press("Control+k");

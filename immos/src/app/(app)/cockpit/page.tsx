@@ -7,6 +7,7 @@ import { Assistent } from "@/components/cockpit/assistent";
 import { VerlaufStrom } from "@/components/cockpit/verlauf-strom";
 import { FristenListe } from "@/components/cockpit/fristen-liste";
 import { ObjektBand } from "@/components/cockpit/objekt-band";
+import { FreihaendigKnopf } from "@/components/cockpit/freihaendig-knopf";
 import { SeitenKopf } from "@/components/shell/seiten-kopf";
 import { Etikett, Karte, KartenKopf, Plakette } from "@/components/ui/display";
 import { formatRelative, formatWochentag, stundeBerlin } from "@/lib/format";
@@ -55,6 +56,7 @@ export default async function CockpitSeite() {
             <Plakette ton="ok" punkt>
               Nachtlauf ohne Fehler
             </Plakette>
+            <FreihaendigKnopf agentNamen={agentNamen} />
           </>
         }
       />
