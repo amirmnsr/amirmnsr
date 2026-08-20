@@ -10,6 +10,9 @@ Aktionen und einer benannten Alternative. Zustimmen oder ablehnen.
 ohne Datenbank und ohne Modellaufruf. Was noch fehlt, steht unten unter
 [Was fehlt](#was-fehlt).
 
+Für eine Vorführung: **[DEMO.md](DEMO.md)** enthält einen Ablauf für acht Minuten.
+Einstieg ist `/hallo?name=Thomas`.
+
 ```bash
 npm install
 npm run dev        # http://localhost:3000
