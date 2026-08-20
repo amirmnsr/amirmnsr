@@ -78,27 +78,67 @@ export default async function CockpitSeite() {
                 jetzt={jetzt}
               />
             </Suspense>
+          <Karte>
+            <KartenKopf
+              titel="Was ImmOS heute übernommen hat"
+              hinweis="Läufe der letzten Stunden mit Ergebnis und Kosten"
+            />
+            <ul className="divide-y divide-line">
+              {cockpit.agentLaeufe.map((lauf) => {
+                const agent = cockpit.agenten.find((a) => a.id === lauf.agentId);
+                return (
+                  <li key={lauf.id} className="flex flex-wrap items-center gap-2 px-4 py-2.5">
+                    <Plakette ton="agent">{agent?.name ?? lauf.agentId}</Plakette>
+                    <span className="min-w-0 flex-1 truncate text-xs text-fg-muted">
+                      {lauf.notiz ?? lauf.ausloeser}
+                    </span>
+                    <Plakette
+                      ton={
+                        lauf.ergebnis === "ausgefuehrt"
+                          ? "ok"
+                          : lauf.ergebnis === "eskaliert"
+                            ? "danger"
+                            : lauf.ergebnis === "vorschlag"
+                              ? "accent"
+                              : "neutral"
+                      }
+                    >
+                      {lauf.ergebnis === "ausgefuehrt"
+                        ? "ausgeführt"
+                        : lauf.ergebnis === "vorschlag"
+                          ? "Vorschlag"
+                          : lauf.ergebnis === "eskaliert"
+                            ? "eskaliert"
+                            : lauf.ergebnis}
+                    </Plakette>
+                    <Etikett className="w-24 text-right">
+                      {(lauf.dauerMs / 1000).toFixed(1)} s
+                      {lauf.kostenCent ? ` · ${lauf.kostenCent} ct` : ""}
+                    </Etikett>
+                  </li>
+                );
+              })}
+            </ul>
+          </Karte>
           </section>
 
           <aside className="flex min-w-0 flex-col gap-4">
-            <div className="h-[26rem] min-h-0">
-              <Assistent
-                vorschlaege={cockpit.queue.map((v) => ({ id: v.id, titel: v.titel }))}
-                sprachbefehle={cockpit.sprachbefehle}
-              />
+            {/* Feste Höhe, damit der Chat scrollt statt die Spalte zu dehnen. */}
+            <div className="h-[26rem] min-h-0 [&>*]:h-full">
+              <Assistent sprachbefehle={cockpit.sprachbefehle} />
             </div>
             <FristenListe
               fristen={cockpit.fristenKritisch}
               jetzt={jetzt}
               objektNamen={objektNamen}
+              grenze={4}
             />
-            <div className="min-h-0 flex-1">
-              <VerlaufStrom
-                ereignisse={cockpit.audit}
-                jetzt={jetzt}
-                objektNamen={objektNamen}
-              />
-            </div>
+            <VerlaufStrom
+              ereignisse={cockpit.audit}
+              jetzt={jetzt}
+              objektNamen={objektNamen}
+              grenze={10}
+            />
           </aside>
         </div>
 
@@ -110,48 +150,6 @@ export default async function CockpitSeite() {
           <ObjektBand objekte={cockpit.objekte} />
         </section>
 
-        <Karte>
-          <KartenKopf
-            titel="Was ImmOS heute übernommen hat"
-            hinweis="Läufe der letzten Stunden mit Ergebnis und Kosten"
-          />
-          <ul className="divide-y divide-line">
-            {cockpit.agentLaeufe.map((lauf) => {
-              const agent = cockpit.agenten.find((a) => a.id === lauf.agentId);
-              return (
-                <li key={lauf.id} className="flex flex-wrap items-center gap-2 px-4 py-2.5">
-                  <Plakette ton="agent">{agent?.name ?? lauf.agentId}</Plakette>
-                  <span className="min-w-0 flex-1 truncate text-xs text-fg-muted">
-                    {lauf.notiz ?? lauf.ausloeser}
-                  </span>
-                  <Plakette
-                    ton={
-                      lauf.ergebnis === "ausgefuehrt"
-                        ? "ok"
-                        : lauf.ergebnis === "eskaliert"
-                          ? "danger"
-                          : lauf.ergebnis === "vorschlag"
-                            ? "accent"
-                            : "neutral"
-                    }
-                  >
-                    {lauf.ergebnis === "ausgefuehrt"
-                      ? "ausgeführt"
-                      : lauf.ergebnis === "vorschlag"
-                        ? "Vorschlag"
-                        : lauf.ergebnis === "eskaliert"
-                          ? "eskaliert"
-                          : lauf.ergebnis}
-                  </Plakette>
-                  <Etikett className="w-24 text-right">
-                    {(lauf.dauerMs / 1000).toFixed(1)} s
-                    {lauf.kostenCent ? ` · ${lauf.kostenCent} ct` : ""}
-                  </Etikett>
-                </li>
-              );
-            })}
-          </ul>
-        </Karte>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import * as Icons from "lucide-react";
 import type { AuditEreignis } from "@/domain";
 import { Karte, KartenKopf, Merkmal, Plakette } from "@/components/ui/display";
 import { formatRelative } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 /**
  * Verlauf
@@ -29,14 +30,18 @@ export function VerlaufStrom({
   jetzt,
   objektNamen,
   grenze = 8,
+  className,
 }: {
   ereignisse: AuditEreignis[];
   jetzt: string;
   objektNamen: Record<string, string>;
   grenze?: number;
+  className?: string;
 }) {
   return (
-    <Karte className="flex min-h-0 flex-col">
+    // Die Liste scrollt innerhalb der Karte. Ohne begrenzte Höhe wüchse sie über
+    // ihre Spalte hinaus und würde den folgenden Abschnitt überlagern.
+    <Karte className={cn("flex max-h-[26rem] flex-col", className)}>
       <KartenKopf
         titel="Verlauf"
         hinweis="Jede Ausführung mit Akteur und Legitimation"

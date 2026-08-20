@@ -44,6 +44,7 @@ export function AppShell({
   const { modulAktiv, offeneVorschlaege, theme, setzeTheme, tonAus, setzeTon, autonomie, sendeChat } =
     useImmos();
   const [paletteOffen, setPaletteOffen] = useState(false);
+  const [menueOffen, setMenueOffen] = useState(false);
   const seitenleiste = useRef<HTMLElement>(null);
   const inhalt = useRef<HTMLDivElement>(null);
 
@@ -148,49 +149,11 @@ export function AppShell({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2 pb-4">
-          {(["arbeit", "fach", "system"] as const).map((gruppe) => {
-            const gruppenEintraege = eintraege.filter((n) => n.gruppe === gruppe);
-            if (gruppenEintraege.length === 0) return null;
-            return (
-              <div key={gruppe} className="mt-3">
-                <p className="label-caps px-2.5 pb-1.5">{GRUPPEN_TITEL[gruppe]}</p>
-                <ul className="space-y-0.5">
-                  {gruppenEintraege.map((eintrag) => {
-                    const aktiv = pfad === eintrag.href || pfad.startsWith(`${eintrag.href}/`);
-                    const zahl = zaehlerWert(eintrag);
-                    return (
-                      <li key={eintrag.href} data-nav-item>
-                        <Link
-                          href={eintrag.href}
-                          className={cn(
-                            "group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs transition-colors",
-                            aktiv
-                              ? "bg-accent-wash text-accent"
-                              : "text-fg-muted hover:bg-surface-2 hover:text-fg",
-                          )}
-                        >
-                          <Symbol name={eintrag.icon} className="h-4 w-4 shrink-0" />
-                          <span className="flex-1 truncate">{eintrag.label}</span>
-                          {zahl > 0 ? (
-                            <span
-                              className={cn(
-                                "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
-                                aktiv
-                                  ? "bg-accent/20 text-accent"
-                                  : "bg-surface-3 text-fg-subtle group-hover:text-fg",
-                              )}
-                            >
-                              {zahl}
-                            </span>
-                          ) : null}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            );
-          })}
+          <NavListe
+            eintraege={eintraege}
+            pfad={pfad}
+            zaehlerWert={zaehlerWert}
+          />
         </nav>
 
         <div className="border-t border-line px-3 py-3">
@@ -212,9 +175,14 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-bg/85 px-4 py-2.5 backdrop-blur">
-          <div className="lg:hidden">
-            <ImmosMark groesse={22} />
-          </div>
+          <button
+            onClick={() => setMenueOffen(true)}
+            aria-label="Menü öffnen"
+            className="flex items-center gap-2 rounded-lg border border-line px-2 py-1.5 text-fg-muted transition-colors hover:text-fg lg:hidden"
+          >
+            <Icons.Menu className="h-4 w-4" strokeWidth={1.7} />
+            <ImmosMark groesse={18} aktiv={false} />
+          </button>
           <button
             onClick={() => setPaletteOffen(true)}
             className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-1.5 text-left text-xs text-fg-subtle transition-colors hover:border-accent-line hover:text-fg sm:max-w-md"
@@ -300,6 +268,36 @@ export function AppShell({
         </div>
       </div>
 
+      {/* Mobile Navigation: unter lg ist die Seitenleiste ausgeblendet, ohne diese
+          Schublade gäbe es dort keinen Weg zwischen den Bereichen. */}
+      {menueOffen ? (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <button
+            aria-label="Menü schließen"
+            className="absolute inset-0 bg-bg-deep/80 backdrop-blur-sm"
+            onClick={() => setMenueOffen(false)}
+          />
+          <div className="relative flex h-full w-64 flex-col border-r border-line bg-surface">
+            <div className="flex items-center gap-2.5 border-b border-line px-4 py-3.5">
+              <ImmosMark groesse={22} />
+              <span className="text-sm font-semibold tracking-tight">
+                Imm<span className="text-accent">OS</span>
+              </span>
+              <button
+                onClick={() => setMenueOffen(false)}
+                aria-label="Schließen"
+                className="ml-auto text-fg-subtle hover:text-fg"
+              >
+                <Icons.X className="h-4 w-4" strokeWidth={1.8} />
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-2 py-2" onClick={() => setMenueOffen(false)}>
+              <NavListe eintraege={eintraege} pfad={pfad} zaehlerWert={zaehlerWert} />
+            </nav>
+          </div>
+        </div>
+      ) : null}
+
       {/* Nur bei Bedarf montiert — dadurch startet die Palette immer mit leerer
           Suche, ohne den Zustand in einem Effekt zurücksetzen zu müssen. */}
       {paletteOffen ? (
@@ -310,6 +308,64 @@ export function AppShell({
         />
       ) : null}
     </div>
+  );
+}
+
+function NavListe({
+  eintraege,
+  pfad,
+  zaehlerWert,
+}: {
+  eintraege: NavEintrag[];
+  pfad: string;
+  zaehlerWert: (eintrag: NavEintrag) => number;
+}) {
+  return (
+    <>
+      {(["arbeit", "fach", "system"] as const).map((gruppe) => {
+        const gruppenEintraege = eintraege.filter((n) => n.gruppe === gruppe);
+        if (gruppenEintraege.length === 0) return null;
+        return (
+          <div key={gruppe} className="mt-3">
+            <p className="label-caps px-2.5 pb-1.5">{GRUPPEN_TITEL[gruppe]}</p>
+            <ul className="space-y-0.5">
+              {gruppenEintraege.map((eintrag) => {
+                const aktiv = pfad === eintrag.href || pfad.startsWith(`${eintrag.href}/`);
+                const zahl = zaehlerWert(eintrag);
+                return (
+                  <li key={eintrag.href} data-nav-item>
+                    <Link
+                      href={eintrag.href}
+                      className={cn(
+                        "group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs transition-colors",
+                        aktiv
+                          ? "bg-accent-wash text-accent"
+                          : "text-fg-muted hover:bg-surface-2 hover:text-fg",
+                      )}
+                    >
+                      <Symbol name={eintrag.icon} className="h-4 w-4 shrink-0" />
+                      <span className="flex-1 truncate">{eintrag.label}</span>
+                      {zahl > 0 ? (
+                        <span
+                          className={cn(
+                            "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
+                            aktiv
+                              ? "bg-accent/20 text-accent"
+                              : "bg-surface-3 text-fg-subtle group-hover:text-fg",
+                          )}
+                        >
+                          {zahl}
+                        </span>
+                      ) : null}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </>
   );
 }
 

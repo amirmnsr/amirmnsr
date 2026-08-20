@@ -7,7 +7,7 @@ import { useSprache } from "@/hooks/use-sprache";
 import { Karte, Etikett } from "@/components/ui/display";
 import { Knopf } from "@/components/ui/controls";
 import { gsap, reduziertBewegung, useGSAP } from "@/components/motion/gsap";
-import { formatTime } from "@/lib/format";
+import { formatCent, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,13 +21,11 @@ import { cn } from "@/lib/utils";
  */
 
 export function Assistent({
-  vorschlaege,
   sprachbefehle,
 }: {
-  vorschlaege: { id: string; titel: string }[];
   sprachbefehle: { satz: string; aktion: string }[];
 }) {
-  const { chat, sendeChat, tonAus } = useImmos();
+  const { chat, sendeChat, tonAus, vorschlaege, entscheide } = useImmos();
   const [eingabe, setEingabe] = useState("");
   const liste = useRef<HTMLDivElement>(null);
   const sprache = useSprache({
@@ -114,19 +112,65 @@ export function Assistent({
                 </ul>
               ) : null}
               {n.vorschlagIds?.length ? (
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="mt-2 space-y-1.5">
                   {n.vorschlagIds.map((id) => {
                     const v = vorschlaege.find((x) => x.id === id);
                     if (!v) return null;
                     return (
-                      <a
+                      <div
                         key={id}
-                        href={`/entscheidungen#${id}`}
-                        className="inline-flex max-w-full items-center gap-1 rounded-full border border-accent-line bg-accent-wash px-2 py-0.5 text-2xs text-accent hover:bg-accent/15"
+                        className="rounded-lg border border-accent-line bg-accent-wash/60 px-2.5 py-2"
                       >
-                        <Icons.ArrowRight className="h-3 w-3 shrink-0" strokeWidth={2} />
-                        <span className="truncate">{v.titel}</span>
-                      </a>
+                        <p className="text-2xs leading-snug font-medium text-fg">{v.titel}</p>
+                        <p className="mt-0.5 text-2xs leading-relaxed text-fg-muted">
+                          {v.kurzfassung}
+                        </p>
+                        {v.status === "offen" ? (
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <Knopf
+                              variante="erfolg"
+                              klein
+                              disabled={v.risiko === "hoch"}
+                              title={
+                                v.risiko === "hoch"
+                                  ? "Bei hohem Risiko zuerst die Belege in der Entscheidungsansicht prüfen"
+                                  : "Vorschlag annehmen und ausführen"
+                              }
+                              onClick={() => entscheide(v.id, "zustimmen", "im Chat freigegeben", 6)}
+                            >
+                              <Icons.Check className="h-3 w-3" strokeWidth={2.4} />
+                              Zustimmen
+                            </Knopf>
+                            <Knopf
+                              variante="gefahr"
+                              klein
+                              onClick={() => entscheide(v.id, "ablehnen", "im Chat abgelehnt", 6)}
+                            >
+                              <Icons.X className="h-3 w-3" strokeWidth={2.4} />
+                              Ablehnen
+                            </Knopf>
+                            <a
+                              href={`/entscheidungen#${id}`}
+                              className="text-2xs text-accent hover:underline"
+                            >
+                              Belege ansehen
+                            </a>
+                            {v.betragCent ? (
+                              <span className="ml-auto text-2xs font-medium tabular-nums text-fg">
+                                {formatCent(v.betragCent)}
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <p className="mt-1.5 text-2xs text-fg-subtle">
+                            {v.status === "abgelehnt"
+                              ? "abgelehnt"
+                              : v.status === "automatisch_ausgefuehrt"
+                                ? "autonom ausgeführt"
+                                : "entschieden"}
+                          </p>
+                        )}
+                      </div>
                     );
                   })}
                 </div>

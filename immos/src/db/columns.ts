@@ -116,9 +116,14 @@ export const zeitscheibe = () => ({
  * (NULL = NULL ist nicht true) — "kein Mandant" bedeutet also "keine Zeile",
  * nicht "alle Zeilen". Das ist die wichtigste Eigenschaft des ganzen Musters.
  *
- * Das `(select ...)` in den Policies ist kein Stilmittel: es lässt Postgres den
- * Aufruf als InitPlan einmal pro Query auswerten statt einmal pro Zeile. Ohne
- * die Klammer wird aus einem Index-Scan ein Funktionsaufruf pro Tupel.
+ * Zum `(select ...)` in den Policies, gemessen an PostgreSQL 16: weil
+ * `immos_sec.mandant()` eine schlichte `sql STABLE`-Funktion ist, inlined der
+ * Planner sie ohnehin in die Index-Bedingung — beide Schreibweisen ergeben hier
+ * einen Index Scan. Der Nutzen der Klammer ist die Garantie, nicht die
+ * Reparatur: sie erzwingt eine einmalige Auswertung als InitPlan und bleibt
+ * damit auch dann korrekt, wenn eine Policy später etwas Nicht-Inlinebares
+ * aufruft (plpgsql, Rollenauflösung, Unterabfrage). Als einheitliche Form
+ * kostet sie nichts und nimmt eine Fußangel dauerhaft aus dem Weg.
  */
 export const aktuellerMandant = sql`(select immos_sec.mandant())`;
 

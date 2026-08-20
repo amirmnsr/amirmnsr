@@ -85,8 +85,28 @@ function reduzieren(state: Sitzung, aktion: Aktion): Sitzung {
 
       const zugestimmt = aktion.entscheidung === "zustimmen" || aktion.entscheidung === "aendern";
 
+      // Jede Entscheidung erscheint im Chat als Quittung. Damit ist der Verlauf
+      // gleichzeitig das Protokoll: was habe ich heute freigegeben, was abgelehnt.
+      const quittung: ChatNachricht = {
+        id: `ch-q-${vorschlag.id}-${entscheidung.am}`,
+        rolle: "immos",
+        am: entscheidung.am,
+        intent: "quittung",
+        text: zugestimmt
+          ? `Erledigt: ${vorschlag.titel}. Ausgeführt wurden ${vorschlag.aktionen.length} ` +
+            `Aktion${vorschlag.aktionen.length === 1 ? "" : "en"} — ` +
+            vorschlag.aktionen.map((a) => a.beschreibung).join("; ") +
+            `. Alles liegt im Nachweis, Rückabwicklung ${vorschlag.reversibel ? "möglich" : "nicht möglich"}.`
+          : aktion.entscheidung === "ablehnen"
+            ? `Abgelehnt: ${vorschlag.titel}.` +
+              (aktion.grund ? ` Grund: ${aktion.grund}.` : "") +
+              ` Ich habe nichts ausgeführt und merke mir das für ähnliche Fälle.`
+            : `Zurückgestellt: ${vorschlag.titel}. Ich lege den Vorgang später erneut vor.`,
+      };
+
       return {
         ...state,
+        chat: [...state.chat, quittung],
         vorschlaege: state.vorschlaege.map((v) =>
           v.id === vorschlag.id ? { ...v, status, entscheidung } : v,
         ),
