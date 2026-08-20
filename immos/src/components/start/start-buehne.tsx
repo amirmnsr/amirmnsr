@@ -126,12 +126,20 @@ export function StartBuehne() {
               Imm<span className="text-accent">OS</span>
             </span>
           </div>
-          <Link
-            href="/cockpit"
-            className="rounded-lg border border-line-strong px-3 py-1.5 text-xs text-fg-muted transition-colors hover:border-accent-line hover:text-accent"
-          >
-            Cockpit öffnen
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/hallo"
+              className="rounded-lg border border-accent-line bg-accent-wash px-3 py-1.5 text-xs text-accent transition-colors hover:bg-accent/15"
+            >
+              Vorführung starten
+            </Link>
+            <Link
+              href="/cockpit"
+              className="rounded-lg border border-line-strong px-3 py-1.5 text-xs text-fg-muted transition-colors hover:border-accent-line hover:text-accent"
+            >
+              Cockpit öffnen
+            </Link>
+          </div>
         </header>
 
         <section className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center">

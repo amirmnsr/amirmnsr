@@ -26,6 +26,8 @@ export const NAVIGATION: NavEintrag[] = [
   { href: "/aufgaben", label: "Vorgänge", icon: "ListChecks", modulId: "aufgaben", gruppe: "arbeit", kuerzel: "4" },
   { href: "/objekte", label: "Objekte", icon: "Building2", gruppe: "arbeit", kuerzel: "5" },
 
+  { href: "/prozesse", label: "Betriebsabläufe", icon: "Workflow", modulId: "aufgaben", gruppe: "fach" },
+
   { href: "/buchhaltung", label: "Buchhaltung", icon: "Calculator", modulId: "buchhaltung", gruppe: "fach" },
   { href: "/abrechnung", label: "Abrechnung", icon: "FileSpreadsheet", modulId: "betriebskosten", gruppe: "fach" },
   { href: "/technik", label: "Technik & Pflichten", icon: "Wrench", modulId: "technik", gruppe: "fach" },

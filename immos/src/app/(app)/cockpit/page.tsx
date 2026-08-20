@@ -8,6 +8,7 @@ import { VerlaufStrom } from "@/components/cockpit/verlauf-strom";
 import { FristenListe } from "@/components/cockpit/fristen-liste";
 import { ObjektBand } from "@/components/cockpit/objekt-band";
 import { FreihaendigKnopf } from "@/components/cockpit/freihaendig-knopf";
+import { GastBegruessung } from "@/components/cockpit/gast-begruessung";
 import { SeitenKopf } from "@/components/shell/seiten-kopf";
 import { Etikett, Karte, KartenKopf, Plakette } from "@/components/ui/display";
 import { formatRelative, formatWochentag, stundeBerlin } from "@/lib/format";
@@ -62,6 +63,9 @@ export default async function CockpitSeite() {
       />
 
       <div className="space-y-5 px-4 py-5 sm:px-6">
+        <GastBegruessung
+          offeneEntscheidungen={cockpit.queue.filter((v) => v.status === "offen").length}
+        />
         <KennzahlenBand kennzahlen={cockpit.kennzahlen} />
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
