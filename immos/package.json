@@ -9,7 +9,11 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:policies": "psql \"$DATABASE_URL\" -f src/db/policies.sql",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

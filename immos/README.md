@@ -123,6 +123,33 @@ gesetzt, nicht zufällig:
 Sprachein- und -ausgabe nutzen im Prototyp die Web Speech API des Browsers
 (Chromium). Fehlt sie, bleibt die Texteingabe unverändert nutzbar.
 
+## Datenbank
+
+Das Schema liegt als Drizzle-Definition bereit, die Anwendung läuft im Prototyp
+aber noch gegen die Seed-Welt. Der Weg zur Datenbank:
+
+```bash
+npm run db:generate          # Migration aus src/db/schema.ts erzeugen
+DATABASE_URL=… npm run db:migrate
+DATABASE_URL=… npm run db:policies   # Trigger, Ausschluss-Constraints, RLS erzwingen
+```
+
+38 Tabellen, 37 Row-Level-Security-Policies. Was die Datenbank garantiert und
+nicht die Anwendungsschicht (`src/db/policies.sql`):
+
+- **Mandantentrennung** über `FORCE ROW LEVEL SECURITY` und
+  `current_setting('immos.mandant_id')` — wirkt auch bei einem Programmfehler
+- **Unveränderbarkeit** festgeschriebener Buchungen und aller Audit-Ereignisse;
+  Korrektur nur per Storno, mit lückenloser Journalnummer je Geschäftsjahr
+- **Überlappungsfreie Zeitscheiben** für Flächen, Mietkonditionen,
+  Eigentumsverhältnisse und Mietverträge — zwei gültige Flächen zum selben
+  Datum machen jede Abrechnung angreifbar
+- **Fachliche Grenzen als Constraint**: Verbrauchsanteil 50–70 %, Autonomiestufe
+  nie über der Höchststufe, Zahlungsprozesse nie autonom, keine Überzahlung
+  eines Postens, Netto plus Steuer gleich Brutto
+- **Nachweispflicht**: ein Vorschlag im Status „zugestimmt" ohne
+  Entscheidungsdatensatz wird abgewiesen
+
 ## Was fehlt
 
 Der Prototyp zeigt Produkt und Fachlichkeit, nicht den Betrieb. Für den

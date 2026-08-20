@@ -1,0 +1,5796 @@
+{
+  "id": "9192daf2-4a39-4ecf-a010-eadd651c0aad",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.abrechnungslaeufe": {
+      "name": "abrechnungslaeufe",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jahr": {
+          "name": "jahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'vorbereitung'"
+        },
+        "frist_am": {
+          "name": "frist_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ergebnis": {
+          "name": "ergebnis",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auffaelligkeiten": {
+          "name": "auffaelligkeiten",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "berechnet_am": {
+          "name": "berechnet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "versendet_am": {
+          "name": "versendet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "abrechnungslaeufe_objekt_id_objekte_id_fk": {
+          "name": "abrechnungslaeufe_objekt_id_objekte_id_fk",
+          "tableFrom": "abrechnungslaeufe",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "abrechnungslaeufe_objekt_id_jahr_art_unique": {
+          "name": "abrechnungslaeufe_objekt_id_jahr_art_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "objekt_id",
+            "jahr",
+            "art"
+          ]
+        }
+      },
+      "policies": {
+        "abrechnungslaeufe_mandant": {
+          "name": "abrechnungslaeufe_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.agent_laeufe": {
+      "name": "agent_laeufe",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ausloeser": {
+          "name": "ausloeser",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ergebnis": {
+          "name": "ergebnis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vorschlag_id": {
+          "name": "vorschlag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dauer_ms": {
+          "name": "dauer_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tokens": {
+          "name": "tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kosten_cent": {
+          "name": "kosten_cent",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modell": {
+          "name": "modell",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notiz": {
+          "name": "notiz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_am": {
+          "name": "start_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "agent_laeufe_agent_idx": {
+          "name": "agent_laeufe_agent_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "agent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "start_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "agent_laeufe_vorschlag_id_vorschlaege_id_fk": {
+          "name": "agent_laeufe_vorschlag_id_vorschlaege_id_fk",
+          "tableFrom": "agent_laeufe",
+          "tableTo": "vorschlaege",
+          "columnsFrom": [
+            "vorschlag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "agent_laeufe_mandant": {
+          "name": "agent_laeufe_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.anlagen": {
+      "name": "anlagen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hersteller": {
+          "name": "hersteller",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "baujahr": {
+          "name": "baujahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "standort": {
+          "name": "standort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zustand": {
+          "name": "zustand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'gut'"
+        },
+        "restnutzungsdauer_jahre": {
+          "name": "restnutzungsdauer_jahre",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "anlagen_objekt_idx": {
+          "name": "anlagen_objekt_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "anlagen_objekt_id_objekte_id_fk": {
+          "name": "anlagen_objekt_id_objekte_id_fk",
+          "tableFrom": "anlagen",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "anlagen_mandant": {
+          "name": "anlagen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.audit_ereignisse": {
+      "name": "audit_ereignisse",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "am": {
+          "name": "am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "akteur_art": {
+          "name": "akteur_art",
+          "type": "akteur_art",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "akteur_id": {
+          "name": "akteur_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "akteur_name": {
+          "name": "akteur_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aktion": {
+          "name": "aktion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entitaet": {
+          "name": "entitaet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entitaet_id": {
+          "name": "entitaet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorschlag_id": {
+          "name": "vorschlag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aenderungen": {
+          "name": "aenderungen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "legitimation": {
+          "name": "legitimation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "audit_zeit_idx": {
+          "name": "audit_zeit_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "audit_entitaet_idx": {
+          "name": "audit_entitaet_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entitaet",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entitaet_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "audit_mandant": {
+          "name": "audit_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.auftraege": {
+      "name": "auftraege",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vorgang_id": {
+          "name": "vorgang_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dienstleister_id": {
+          "name": "dienstleister_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gewerk": {
+          "name": "gewerk",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beschreibung": {
+          "name": "beschreibung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'angefragt'"
+        },
+        "budget_cent": {
+          "name": "budget_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "angebot_cent": {
+          "name": "angebot_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rechnung_cent": {
+          "name": "rechnung_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beauftragt_am": {
+          "name": "beauftragt_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "termin_am": {
+          "name": "termin_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gewaehrleistung_bis": {
+          "name": "gewaehrleistung_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beschluss_id": {
+          "name": "beschluss_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "versicherungsfall": {
+          "name": "versicherungsfall",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "auftraege_gewaehrleistung_idx": {
+          "name": "auftraege_gewaehrleistung_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "gewaehrleistung_bis",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auftraege_vorgang_id_vorgaenge_id_fk": {
+          "name": "auftraege_vorgang_id_vorgaenge_id_fk",
+          "tableFrom": "auftraege",
+          "tableTo": "vorgaenge",
+          "columnsFrom": [
+            "vorgang_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "auftraege_dienstleister_id_personen_id_fk": {
+          "name": "auftraege_dienstleister_id_personen_id_fk",
+          "tableFrom": "auftraege",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "dienstleister_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "auftraege_mandant_id_nummer_unique": {
+          "name": "auftraege_mandant_id_nummer_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "nummer"
+          ]
+        }
+      },
+      "policies": {
+        "auftraege_mandant": {
+          "name": "auftraege_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.autonomie_regeln": {
+      "name": "autonomie_regeln",
+      "schema": "",
+      "columns": {
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prozess": {
+          "name": "prozess",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modul_id": {
+          "name": "modul_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stufe": {
+          "name": "stufe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "betragsgrenze_cent": {
+          "name": "betragsgrenze_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "widerspruchsfenster_minuten": {
+          "name": "widerspruchsfenster_minuten",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "max_stufe": {
+          "name": "max_stufe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 3
+        },
+        "max_stufe_grund": {
+          "name": "max_stufe_grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geaendert_am": {
+          "name": "geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "geaendert_von": {
+          "name": "geaendert_von",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "autonomie_regeln_geaendert_von_nutzer_id_fk": {
+          "name": "autonomie_regeln_geaendert_von_nutzer_id_fk",
+          "tableFrom": "autonomie_regeln",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "geaendert_von"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "autonomie_regeln_mandant_id_prozess_pk": {
+          "name": "autonomie_regeln_mandant_id_prozess_pk",
+          "columns": [
+            "mandant_id",
+            "prozess"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "autonomie_regeln_mandant": {
+          "name": "autonomie_regeln_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.bankkonten": {
+      "name": "bankkonten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "iban": {
+          "name": "iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bic": {
+          "name": "bic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bank": {
+          "name": "bank",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "saldo_cent": {
+          "name": "saldo_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "letzter_abruf": {
+          "name": "letzter_abruf",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "bankkonten_objekt_id_objekte_id_fk": {
+          "name": "bankkonten_objekt_id_objekte_id_fk",
+          "tableFrom": "bankkonten",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "bankkonten_mandant_id_iban_unique": {
+          "name": "bankkonten_mandant_id_iban_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "iban"
+          ]
+        }
+      },
+      "policies": {
+        "bankkonten_mandant": {
+          "name": "bankkonten_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.beschluesse": {
+      "name": "beschluesse",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "versammlung_id": {
+          "name": "versammlung_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "laufende_nr": {
+          "name": "laufende_nr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "datum": {
+          "name": "datum",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gegenstand": {
+          "name": "gegenstand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wortlaut": {
+          "name": "wortlaut",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ergebnis": {
+          "name": "ergebnis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ja_stimmen": {
+          "name": "ja_stimmen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "nein_stimmen": {
+          "name": "nein_stimmen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "enthaltungen": {
+          "name": "enthaltungen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "umlaufbeschluss": {
+          "name": "umlaufbeschluss",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "anfechtungsfrist_bis": {
+          "name": "anfechtungsfrist_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "budget_cent": {
+          "name": "budget_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "umsetzung_status": {
+          "name": "umsetzung_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'offen'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "beschluesse_objekt_id_objekte_id_fk": {
+          "name": "beschluesse_objekt_id_objekte_id_fk",
+          "tableFrom": "beschluesse",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "beschluesse_objekt_id_datum_laufende_nr_unique": {
+          "name": "beschluesse_objekt_id_datum_laufende_nr_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "objekt_id",
+            "datum",
+            "laufende_nr"
+          ]
+        }
+      },
+      "policies": {
+        "beschluesse_mandant": {
+          "name": "beschluesse_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.buchungen": {
+      "name": "buchungen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "journal_nr": {
+          "name": "journal_nr",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geschaeftsjahr": {
+          "name": "geschaeftsjahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beleg_nr": {
+          "name": "beleg_nr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dokument_id": {
+          "name": "dokument_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datum": {
+          "name": "datum",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leistung_von": {
+          "name": "leistung_von",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leistung_bis": {
+          "name": "leistung_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soll_konto": {
+          "name": "soll_konto",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "haben_konto": {
+          "name": "haben_konto",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ust_satz": {
+          "name": "ust_satz",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ust_betrag_cent": {
+          "name": "ust_betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "festgeschrieben": {
+          "name": "festgeschrieben",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "storno_von_id": {
+          "name": "storno_von_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erfasst_von": {
+          "name": "erfasst_von",
+          "type": "erfassungsart",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nutzer_id": {
+          "name": "nutzer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erfasst_am": {
+          "name": "erfasst_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "buchungen_objekt_datum_idx": {
+          "name": "buchungen_objekt_datum_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "datum",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "buchungen_objekt_id_objekte_id_fk": {
+          "name": "buchungen_objekt_id_objekte_id_fk",
+          "tableFrom": "buchungen",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "buchungen_einheit_id_einheiten_id_fk": {
+          "name": "buchungen_einheit_id_einheiten_id_fk",
+          "tableFrom": "buchungen",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "buchungen_nutzer_id_nutzer_id_fk": {
+          "name": "buchungen_nutzer_id_nutzer_id_fk",
+          "tableFrom": "buchungen",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "nutzer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "buchungen_mandant_id_geschaeftsjahr_journal_nr_unique": {
+          "name": "buchungen_mandant_id_geschaeftsjahr_journal_nr_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "geschaeftsjahr",
+            "journal_nr"
+          ]
+        }
+      },
+      "policies": {
+        "buchungen_mandant": {
+          "name": "buchungen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.dokumente": {
+      "name": "dokumente",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorgang_id": {
+          "name": "vorgang_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titel": {
+          "name": "titel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aktenplan": {
+          "name": "aktenplan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dateiname": {
+          "name": "dateiname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mime": {
+          "name": "mime",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "groesse_bytes": {
+          "name": "groesse_bytes",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seiten": {
+          "name": "seiten",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sha256": {
+          "name": "sha256",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "speicher_schluessel": {
+          "name": "speicher_schluessel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ocr_text": {
+          "name": "ocr_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vertraulich": {
+          "name": "vertraulich",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "aufbewahrung_bis": {
+          "name": "aufbewahrung_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "dokumente_objekt_idx": {
+          "name": "dokumente_objekt_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "dokumente_objekt_id_objekte_id_fk": {
+          "name": "dokumente_objekt_id_objekte_id_fk",
+          "tableFrom": "dokumente",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "dokumente_vorgang_id_vorgaenge_id_fk": {
+          "name": "dokumente_vorgang_id_vorgaenge_id_fk",
+          "tableFrom": "dokumente",
+          "tableTo": "vorgaenge",
+          "columnsFrom": [
+            "vorgang_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "dokumente_mandant_id_sha256_unique": {
+          "name": "dokumente_mandant_id_sha256_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "sha256"
+          ]
+        }
+      },
+      "policies": {
+        "dokumente_mandant": {
+          "name": "dokumente_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.eigentumsverhaeltnisse": {
+      "name": "eigentumsverhaeltnisse",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eigentuemer_id": {
+          "name": "eigentuemer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mea_tausendstel": {
+          "name": "mea_tausendstel",
+          "type": "numeric(7, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "selbstnutzer": {
+          "name": "selbstnutzer",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sev_auftrag": {
+          "name": "sev_auftrag",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "gueltig_von": {
+          "name": "gueltig_von",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gueltig_bis": {
+          "name": "gueltig_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "eigentum_einheit_idx": {
+          "name": "eigentum_einheit_idx",
+          "columns": [
+            {
+              "expression": "einheit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "gueltig_von",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "eigentumsverhaeltnisse_einheit_id_einheiten_id_fk": {
+          "name": "eigentumsverhaeltnisse_einheit_id_einheiten_id_fk",
+          "tableFrom": "eigentumsverhaeltnisse",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "eigentumsverhaeltnisse_eigentuemer_id_personen_id_fk": {
+          "name": "eigentumsverhaeltnisse_eigentuemer_id_personen_id_fk",
+          "tableFrom": "eigentumsverhaeltnisse",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "eigentuemer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "eigentumsverhaeltnisse_mandant": {
+          "name": "eigentumsverhaeltnisse_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.eingangsrechnungen": {
+      "name": "eingangsrechnungen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postfach_id": {
+          "name": "postfach_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nachricht_id": {
+          "name": "nachricht_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dokument_id": {
+          "name": "dokument_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "format": {
+          "name": "format",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kreditor_id": {
+          "name": "kreditor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kreditor_name_roh": {
+          "name": "kreditor_name_roh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rechnungs_nr": {
+          "name": "rechnungs_nr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rechnungsdatum": {
+          "name": "rechnungsdatum",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leistung_von": {
+          "name": "leistung_von",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leistung_bis": {
+          "name": "leistung_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "faellig_am": {
+          "name": "faellig_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skonto_bis": {
+          "name": "skonto_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skonto_prozent": {
+          "name": "skonto_prozent",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brutto_cent": {
+          "name": "brutto_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "netto_cent": {
+          "name": "netto_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ust_cent": {
+          "name": "ust_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ust_satz": {
+          "name": "ust_satz",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 19
+        },
+        "iban": {
+          "name": "iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "konto_vorschlag": {
+          "name": "konto_vorschlag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "umlagefaehig_vorschlag": {
+          "name": "umlagefaehig_vorschlag",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auftrag_id": {
+          "name": "auftrag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "rechnung_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'eingegangen'"
+        },
+        "pruefung": {
+          "name": "pruefung",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "extraktions_konfidenz": {
+          "name": "extraktions_konfidenz",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eingang_am": {
+          "name": "eingang_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "eingangsrechnungen_status_idx": {
+          "name": "eingangsrechnungen_status_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "eingangsrechnungen_objekt_id_objekte_id_fk": {
+          "name": "eingangsrechnungen_objekt_id_objekte_id_fk",
+          "tableFrom": "eingangsrechnungen",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "eingangsrechnungen_einheit_id_einheiten_id_fk": {
+          "name": "eingangsrechnungen_einheit_id_einheiten_id_fk",
+          "tableFrom": "eingangsrechnungen",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "eingangsrechnungen_postfach_id_postfaecher_id_fk": {
+          "name": "eingangsrechnungen_postfach_id_postfaecher_id_fk",
+          "tableFrom": "eingangsrechnungen",
+          "tableTo": "postfaecher",
+          "columnsFrom": [
+            "postfach_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "eingangsrechnungen_kreditor_id_personen_id_fk": {
+          "name": "eingangsrechnungen_kreditor_id_personen_id_fk",
+          "tableFrom": "eingangsrechnungen",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "kreditor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "eingangsrechnungen_mandant_id_kreditor_id_rechnungs_nr_unique": {
+          "name": "eingangsrechnungen_mandant_id_kreditor_id_rechnungs_nr_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "kreditor_id",
+            "rechnungs_nr"
+          ]
+        }
+      },
+      "policies": {
+        "eingangsrechnungen_mandant": {
+          "name": "eingangsrechnungen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.einheit_flaechen": {
+      "name": "einheit_flaechen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flaeche_m2": {
+          "name": "flaeche_m2",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "personenzahl": {
+          "name": "personenzahl",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "mea_tausendstel": {
+          "name": "mea_tausendstel",
+          "type": "numeric(7, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gueltig_von": {
+          "name": "gueltig_von",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gueltig_bis": {
+          "name": "gueltig_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grund": {
+          "name": "grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "einheit_flaechen_einheit_idx": {
+          "name": "einheit_flaechen_einheit_idx",
+          "columns": [
+            {
+              "expression": "einheit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "gueltig_von",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "einheit_flaechen_einheit_id_einheiten_id_fk": {
+          "name": "einheit_flaechen_einheit_id_einheiten_id_fk",
+          "tableFrom": "einheit_flaechen",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "einheit_flaechen_mandant": {
+          "name": "einheit_flaechen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.einheiten": {
+      "name": "einheiten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lage": {
+          "name": "lage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "typ": {
+          "name": "typ",
+          "type": "einheit_typ",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "einheit_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'vermietet'"
+        },
+        "zimmer": {
+          "name": "zimmer",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "balkon": {
+          "name": "balkon",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "aufzug": {
+          "name": "aufzug",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "ust_option": {
+          "name": "ust_option",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "einheiten_mandant_objekt_idx": {
+          "name": "einheiten_mandant_objekt_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "einheiten_objekt_id_objekte_id_fk": {
+          "name": "einheiten_objekt_id_objekte_id_fk",
+          "tableFrom": "einheiten",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "einheiten_objekt_id_nummer_unique": {
+          "name": "einheiten_objekt_id_nummer_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "objekt_id",
+            "nummer"
+          ]
+        }
+      },
+      "policies": {
+        "einheiten_mandant": {
+          "name": "einheiten_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.entscheidungen": {
+      "name": "entscheidungen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vorschlag_id": {
+          "name": "vorschlag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entscheider_id": {
+          "name": "entscheider_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entscheidung": {
+          "name": "entscheidung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grund": {
+          "name": "grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aenderungen": {
+          "name": "aenderungen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entscheidungsdauer_sek": {
+          "name": "entscheidungsdauer_sek",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "am": {
+          "name": "am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "entscheidungen_vorschlag_idx": {
+          "name": "entscheidungen_vorschlag_idx",
+          "columns": [
+            {
+              "expression": "vorschlag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "entscheidungen_vorschlag_id_vorschlaege_id_fk": {
+          "name": "entscheidungen_vorschlag_id_vorschlaege_id_fk",
+          "tableFrom": "entscheidungen",
+          "tableTo": "vorschlaege",
+          "columnsFrom": [
+            "vorschlag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "entscheidungen_entscheider_id_nutzer_id_fk": {
+          "name": "entscheidungen_entscheider_id_nutzer_id_fk",
+          "tableFrom": "entscheidungen",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "entscheider_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "entscheidungen_mandant": {
+          "name": "entscheidungen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.fristen": {
+      "name": "fristen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rechtsgrundlage": {
+          "name": "rechtsgrundlage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorgang_id": {
+          "name": "vorgang_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ablauf_am": {
+          "name": "ablauf_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vorlauf_tage": {
+          "name": "vorlauf_tage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 14
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'offen'"
+        },
+        "konsequenz": {
+          "name": "konsequenz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eskalationsstufe": {
+          "name": "eskalationsstufe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "verantwortlicher_id": {
+          "name": "verantwortlicher_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "fristen_ablauf_idx": {
+          "name": "fristen_ablauf_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "ablauf_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "fristen_objekt_id_objekte_id_fk": {
+          "name": "fristen_objekt_id_objekte_id_fk",
+          "tableFrom": "fristen",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fristen_vorgang_id_vorgaenge_id_fk": {
+          "name": "fristen_vorgang_id_vorgaenge_id_fk",
+          "tableFrom": "fristen",
+          "tableTo": "vorgaenge",
+          "columnsFrom": [
+            "vorgang_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fristen_verantwortlicher_id_nutzer_id_fk": {
+          "name": "fristen_verantwortlicher_id_nutzer_id_fk",
+          "tableFrom": "fristen",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "verantwortlicher_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "fristen_mandant": {
+          "name": "fristen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.konten": {
+      "name": "konten",
+      "schema": "",
+      "columns": {
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "kontoart",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "umlagefaehig": {
+          "name": "umlagefaehig",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "standard_schluessel": {
+          "name": "standard_schluessel",
+          "type": "umlageschluessel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "betrkv": {
+          "name": "betrkv",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paragraf_35a": {
+          "name": "paragraf_35a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "konten_mandant_id_nummer_pk": {
+          "name": "konten_mandant_id_nummer_pk",
+          "columns": [
+            "mandant_id",
+            "nummer"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "konten_mandant": {
+          "name": "konten_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.kontoumsaetze": {
+      "name": "kontoumsaetze",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bankkonto_id": {
+          "name": "bankkonto_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "import_schluessel": {
+          "name": "import_schluessel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "buchungstag": {
+          "name": "buchungstag",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valuta": {
+          "name": "valuta",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gegenkonto_name": {
+          "name": "gegenkonto_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gegenkonto_iban": {
+          "name": "gegenkonto_iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verwendungszweck": {
+          "name": "verwendungszweck",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_to_end_id": {
+          "name": "end_to_end_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mandatsreferenz": {
+          "name": "mandatsreferenz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zuordnung": {
+          "name": "zuordnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'offen'"
+        },
+        "match_konfidenz": {
+          "name": "match_konfidenz",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "match_regel": {
+          "name": "match_regel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "match_begruendung": {
+          "name": "match_begruendung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "kontoumsaetze_offen_idx": {
+          "name": "kontoumsaetze_offen_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "zuordnung",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kontoumsaetze_bankkonto_id_bankkonten_id_fk": {
+          "name": "kontoumsaetze_bankkonto_id_bankkonten_id_fk",
+          "tableFrom": "kontoumsaetze",
+          "tableTo": "bankkonten",
+          "columnsFrom": [
+            "bankkonto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "kontoumsaetze_bankkonto_id_import_schluessel_unique": {
+          "name": "kontoumsaetze_bankkonto_id_import_schluessel_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "bankkonto_id",
+            "import_schluessel"
+          ]
+        }
+      },
+      "policies": {
+        "kontoumsaetze_mandant": {
+          "name": "kontoumsaetze_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.kostenpositionen": {
+      "name": "kostenpositionen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jahr": {
+          "name": "jahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "konto_nr": {
+          "name": "konto_nr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "umlagefaehig": {
+          "name": "umlagefaehig",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "schluessel": {
+          "name": "schluessel",
+          "type": "umlageschluessel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vorwegabzug_cent": {
+          "name": "vorwegabzug_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "vorwegabzug_grund": {
+          "name": "vorwegabzug_grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paragraf_35a_cent": {
+          "name": "paragraf_35a_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "co2_kosten_cent": {
+          "name": "co2_kosten_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "heizkosten": {
+          "name": "heizkosten",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "beleg_ids": {
+          "name": "beleg_ids",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        }
+      },
+      "indexes": {
+        "kostenpositionen_objekt_jahr_idx": {
+          "name": "kostenpositionen_objekt_jahr_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "jahr",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kostenpositionen_objekt_id_objekte_id_fk": {
+          "name": "kostenpositionen_objekt_id_objekte_id_fk",
+          "tableFrom": "kostenpositionen",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "kostenpositionen_mandant": {
+          "name": "kostenpositionen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.mandanten": {
+      "name": "mandanten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kurz": {
+          "name": "kurz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mail_domain": {
+          "name": "mail_domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sitz": {
+          "name": "sitz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ust_id_nr": {
+          "name": "ust_id_nr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "angelegt_am": {
+          "name": "angelegt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "mandanten_mail_domain_unique": {
+          "name": "mandanten_mail_domain_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mail_domain"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mietkonditionen": {
+      "name": "mietkonditionen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vertrag_id": {
+          "name": "vertrag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "miete_kalt_cent": {
+          "name": "miete_kalt_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bk_vorauszahlung_cent": {
+          "name": "bk_vorauszahlung_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "hk_vorauszahlung_cent": {
+          "name": "hk_vorauszahlung_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "stellplatz_cent": {
+          "name": "stellplatz_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "gueltig_von": {
+          "name": "gueltig_von",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gueltig_bis": {
+          "name": "gueltig_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grund": {
+          "name": "grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "mietkonditionen_vertrag_idx": {
+          "name": "mietkonditionen_vertrag_idx",
+          "columns": [
+            {
+              "expression": "vertrag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "gueltig_von",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "mietkonditionen_vertrag_id_mietvertraege_id_fk": {
+          "name": "mietkonditionen_vertrag_id_mietvertraege_id_fk",
+          "tableFrom": "mietkonditionen",
+          "tableTo": "mietvertraege",
+          "columnsFrom": [
+            "vertrag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "mietkonditionen_mandant": {
+          "name": "mietkonditionen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.mietvertraege": {
+      "name": "mietvertraege",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beginn": {
+          "name": "beginn",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ende": {
+          "name": "ende",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gekuendigt_zum": {
+          "name": "gekuendigt_zum",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kuendigung_eingang": {
+          "name": "kuendigung_eingang",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kaution_cent": {
+          "name": "kaution_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "kautionsart": {
+          "name": "kautionsart",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kaution_eingegangen": {
+          "name": "kaution_eingegangen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "anpassungsart": {
+          "name": "anpassungsart",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'vergleichsmiete'"
+        },
+        "index_basis": {
+          "name": "index_basis",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ust_pflichtig": {
+          "name": "ust_pflichtig",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "besondere_vereinbarungen": {
+          "name": "besondere_vereinbarungen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        }
+      },
+      "indexes": {
+        "mietvertraege_einheit_idx": {
+          "name": "mietvertraege_einheit_idx",
+          "columns": [
+            {
+              "expression": "einheit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "beginn",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "mietvertraege_objekt_id_objekte_id_fk": {
+          "name": "mietvertraege_objekt_id_objekte_id_fk",
+          "tableFrom": "mietvertraege",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "mietvertraege_einheit_id_einheiten_id_fk": {
+          "name": "mietvertraege_einheit_id_einheiten_id_fk",
+          "tableFrom": "mietvertraege",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "mietvertraege_mandant": {
+          "name": "mietvertraege_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.modul_konfiguration": {
+      "name": "modul_konfiguration",
+      "schema": "",
+      "columns": {
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modul_id": {
+          "name": "modul_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aktiv": {
+          "name": "aktiv",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "geaendert_am": {
+          "name": "geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "geaendert_von": {
+          "name": "geaendert_von",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "modul_konfiguration_mandant_id_mandanten_id_fk": {
+          "name": "modul_konfiguration_mandant_id_mandanten_id_fk",
+          "tableFrom": "modul_konfiguration",
+          "tableTo": "mandanten",
+          "columnsFrom": [
+            "mandant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "modul_konfiguration_mandant_id_modul_id_pk": {
+          "name": "modul_konfiguration_mandant_id_modul_id_pk",
+          "columns": [
+            "mandant_id",
+            "modul_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "modul_konfiguration_mandant": {
+          "name": "modul_konfiguration_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.nachrichten": {
+      "name": "nachrichten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "richtung": {
+          "name": "richtung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kanal": {
+          "name": "kanal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postfach_id": {
+          "name": "postfach_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorgang_id": {
+          "name": "vorgang_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "externe_id": {
+          "name": "externe_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thread_id": {
+          "name": "thread_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "absender": {
+          "name": "absender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "absender_name": {
+          "name": "absender_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "empfaenger": {
+          "name": "empfaenger",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "betreff": {
+          "name": "betreff",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "speicher_schluessel": {
+          "name": "speicher_schluessel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorschau": {
+          "name": "vorschau",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intent": {
+          "name": "intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intent_konfidenz": {
+          "name": "intent_konfidenz",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stimmung": {
+          "name": "stimmung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sicherheit": {
+          "name": "sicherheit",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gelesen": {
+          "name": "gelesen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "eingang_am": {
+          "name": "eingang_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "nachrichten_postfach_idx": {
+          "name": "nachrichten_postfach_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "postfach_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "eingang_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "nachrichten_postfach_id_postfaecher_id_fk": {
+          "name": "nachrichten_postfach_id_postfaecher_id_fk",
+          "tableFrom": "nachrichten",
+          "tableTo": "postfaecher",
+          "columnsFrom": [
+            "postfach_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "nachrichten_objekt_id_objekte_id_fk": {
+          "name": "nachrichten_objekt_id_objekte_id_fk",
+          "tableFrom": "nachrichten",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "nachrichten_vorgang_id_vorgaenge_id_fk": {
+          "name": "nachrichten_vorgang_id_vorgaenge_id_fk",
+          "tableFrom": "nachrichten",
+          "tableTo": "vorgaenge",
+          "columnsFrom": [
+            "vorgang_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "nachrichten_mandant_id_externe_id_unique": {
+          "name": "nachrichten_mandant_id_externe_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "externe_id"
+          ]
+        }
+      },
+      "policies": {
+        "nachrichten_mandant": {
+          "name": "nachrichten_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.nutzer": {
+      "name": "nutzer",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rolle": {
+          "name": "rolle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'verwalter'"
+        },
+        "zwei_faktor_aktiv": {
+          "name": "zwei_faktor_aktiv",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "zahlungsberechtigt": {
+          "name": "zahlungsberechtigt",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "aktiv": {
+          "name": "aktiv",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nutzer_mandant_id_mandanten_id_fk": {
+          "name": "nutzer_mandant_id_mandanten_id_fk",
+          "tableFrom": "nutzer",
+          "tableTo": "mandanten",
+          "columnsFrom": [
+            "mandant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "nutzer_mandant_id_email_unique": {
+          "name": "nutzer_mandant_id_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "email"
+          ]
+        }
+      },
+      "policies": {
+        "nutzer_mandant": {
+          "name": "nutzer_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.objekte": {
+      "name": "objekte",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "strasse": {
+          "name": "strasse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plz": {
+          "name": "plz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ort": {
+          "name": "ort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verwaltungsarten": {
+          "name": "verwaltungsarten",
+          "type": "verwaltungsart[]",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baujahr": {
+          "name": "baujahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heizungsart": {
+          "name": "heizungsart",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "energietraeger": {
+          "name": "energietraeger",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "co2_emission_kg_pro_m2": {
+          "name": "co2_emission_kg_pro_m2",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heizkosten_verbrauchsanteil": {
+          "name": "heizkosten_verbrauchsanteil",
+          "type": "numeric(3, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0.70'"
+        },
+        "abrechnungszeitraum_start": {
+          "name": "abrechnungszeitraum_start",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'01-01'"
+        },
+        "verwaltungsbeginn": {
+          "name": "verwaltungsbeginn",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verwaltungsende": {
+          "name": "verwaltungsende",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notizen": {
+          "name": "notizen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "objekte_mandant_idx": {
+          "name": "objekte_mandant_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "objekte_mandant_id_mandanten_id_fk": {
+          "name": "objekte_mandant_id_mandanten_id_fk",
+          "tableFrom": "objekte",
+          "tableTo": "mandanten",
+          "columnsFrom": [
+            "mandant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "objekte_mandant_id_nummer_unique": {
+          "name": "objekte_mandant_id_nummer_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "nummer"
+          ]
+        }
+      },
+      "policies": {
+        "objekte_mandant": {
+          "name": "objekte_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.person_rollen": {
+      "name": "person_rollen",
+      "schema": "",
+      "columns": {
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rolle": {
+          "name": "rolle",
+          "type": "person_rolle",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "person_rollen_person_id_personen_id_fk": {
+          "name": "person_rollen_person_id_personen_id_fk",
+          "tableFrom": "person_rollen",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "person_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "person_rollen_person_id_rolle_pk": {
+          "name": "person_rollen_person_id_rolle_pk",
+          "columns": [
+            "person_id",
+            "rolle"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "person_rollen_mandant": {
+          "name": "person_rollen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.personen": {
+      "name": "personen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "typ": {
+          "name": "typ",
+          "type": "person_typ",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "anrede": {
+          "name": "anrede",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefon": {
+          "name": "telefon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mobil": {
+          "name": "mobil",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "strasse": {
+          "name": "strasse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plz": {
+          "name": "plz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ort": {
+          "name": "ort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "iban": {
+          "name": "iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "iban_geaendert_am": {
+          "name": "iban_geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kreditor_nr": {
+          "name": "kreditor_nr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gewerk": {
+          "name": "gewerk",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reaktionszeit_stunden": {
+          "name": "reaktionszeit_stunden",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bewertung": {
+          "name": "bewertung",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bevorzugter_kanal": {
+          "name": "bevorzugter_kanal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seit": {
+          "name": "seit",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geloescht_am": {
+          "name": "geloescht_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "personen_mandant_idx": {
+          "name": "personen_mandant_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "personen_iban_idx": {
+          "name": "personen_iban_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "iban",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "personen_mandant": {
+          "name": "personen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.postfaecher": {
+      "name": "postfaecher",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zweck": {
+          "name": "zweck",
+          "type": "postfach_zweck",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adresse": {
+          "name": "adresse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aktiv": {
+          "name": "aktiv",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "fallback": {
+          "name": "fallback",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'triage'"
+        },
+        "absender_whitelist": {
+          "name": "absender_whitelist",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        }
+      },
+      "indexes": {
+        "postfaecher_objekt_idx": {
+          "name": "postfaecher_objekt_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "objekt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "postfaecher_objekt_id_objekte_id_fk": {
+          "name": "postfaecher_objekt_id_objekte_id_fk",
+          "tableFrom": "postfaecher",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "postfaecher_adresse_unique": {
+          "name": "postfaecher_adresse_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "adresse"
+          ]
+        }
+      },
+      "policies": {
+        "postfaecher_mandant": {
+          "name": "postfaecher_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.pruefpflichten": {
+      "name": "pruefpflichten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "anlage_id": {
+          "name": "anlage_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rechtsgrundlage": {
+          "name": "rechtsgrundlage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "intervall_monate": {
+          "name": "intervall_monate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "letzte_pruefung": {
+          "name": "letzte_pruefung",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naechste_pruefung": {
+          "name": "naechste_pruefung",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "haftungsrisiko": {
+          "name": "haftungsrisiko",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'mittel'"
+        },
+        "zustaendiger_id": {
+          "name": "zustaendiger_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nachweis_dokument_id": {
+          "name": "nachweis_dokument_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "pruefpflichten_faellig_idx": {
+          "name": "pruefpflichten_faellig_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "naechste_pruefung",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pruefpflichten_anlage_id_anlagen_id_fk": {
+          "name": "pruefpflichten_anlage_id_anlagen_id_fk",
+          "tableFrom": "pruefpflichten",
+          "tableTo": "anlagen",
+          "columnsFrom": [
+            "anlage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pruefpflichten_zustaendiger_id_nutzer_id_fk": {
+          "name": "pruefpflichten_zustaendiger_id_nutzer_id_fk",
+          "tableFrom": "pruefpflichten",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "zustaendiger_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "pruefpflichten_mandant": {
+          "name": "pruefpflichten_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.sepa_mandate": {
+      "name": "sepa_mandate",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vertrag_id": {
+          "name": "vertrag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mandatsreferenz": {
+          "name": "mandatsreferenz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "iban": {
+          "name": "iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'core'"
+        },
+        "unterschrift_am": {
+          "name": "unterschrift_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "letzte_nutzung": {
+          "name": "letzte_nutzung",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aktiv": {
+          "name": "aktiv",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "ungueltig_grund": {
+          "name": "ungueltig_grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sepa_mandate_vertrag_id_mietvertraege_id_fk": {
+          "name": "sepa_mandate_vertrag_id_mietvertraege_id_fk",
+          "tableFrom": "sepa_mandate",
+          "tableTo": "mietvertraege",
+          "columnsFrom": [
+            "vertrag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "sepa_mandate_person_id_personen_id_fk": {
+          "name": "sepa_mandate_person_id_personen_id_fk",
+          "tableFrom": "sepa_mandate",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "person_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sepa_mandate_mandant_id_mandatsreferenz_unique": {
+          "name": "sepa_mandate_mandant_id_mandatsreferenz_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "mandatsreferenz"
+          ]
+        }
+      },
+      "policies": {
+        "sepa_mandate_mandant": {
+          "name": "sepa_mandate_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.sollstellungen": {
+      "name": "sollstellungen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vertrag_id": {
+          "name": "vertrag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "periode": {
+          "name": "periode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "soll_art",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezahlt_cent": {
+          "name": "bezahlt_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "faellig_am": {
+          "name": "faellig_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mahnstufe": {
+          "name": "mahnstufe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "buchung_id": {
+          "name": "buchung_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "storniert_am": {
+          "name": "storniert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "sollstellungen_offen_idx": {
+          "name": "sollstellungen_offen_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "faellig_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "sollstellungen_vertrag_id_mietvertraege_id_fk": {
+          "name": "sollstellungen_vertrag_id_mietvertraege_id_fk",
+          "tableFrom": "sollstellungen",
+          "tableTo": "mietvertraege",
+          "columnsFrom": [
+            "vertrag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "sollstellungen_buchung_id_buchungen_id_fk": {
+          "name": "sollstellungen_buchung_id_buchungen_id_fk",
+          "tableFrom": "sollstellungen",
+          "tableTo": "buchungen",
+          "columnsFrom": [
+            "buchung_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sollstellungen_vertrag_id_periode_art_unique": {
+          "name": "sollstellungen_vertrag_id_periode_art_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "vertrag_id",
+            "periode",
+            "art"
+          ]
+        }
+      },
+      "policies": {
+        "sollstellungen_mandant": {
+          "name": "sollstellungen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.vertragsparteien": {
+      "name": "vertragsparteien",
+      "schema": "",
+      "columns": {
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vertrag_id": {
+          "name": "vertrag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hauptmieter": {
+          "name": "hauptmieter",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vertragsparteien_vertrag_id_mietvertraege_id_fk": {
+          "name": "vertragsparteien_vertrag_id_mietvertraege_id_fk",
+          "tableFrom": "vertragsparteien",
+          "tableTo": "mietvertraege",
+          "columnsFrom": [
+            "vertrag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "vertragsparteien_person_id_personen_id_fk": {
+          "name": "vertragsparteien_person_id_personen_id_fk",
+          "tableFrom": "vertragsparteien",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "person_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "vertragsparteien_vertrag_id_person_id_pk": {
+          "name": "vertragsparteien_vertrag_id_person_id_pk",
+          "columns": [
+            "vertrag_id",
+            "person_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "vertragsparteien_mandant": {
+          "name": "vertragsparteien_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.vorgaenge": {
+      "name": "vorgaenge",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titel": {
+          "name": "titel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kategorie": {
+          "name": "kategorie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kanal": {
+          "name": "kanal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prioritaet": {
+          "name": "prioritaet",
+          "type": "prioritaet",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'normal'"
+        },
+        "status": {
+          "name": "status",
+          "type": "vorgang_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'neu'"
+        },
+        "melder_id": {
+          "name": "melder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bearbeiter_id": {
+          "name": "bearbeiter_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zusammenfassung": {
+          "name": "zusammenfassung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gruppe_id": {
+          "name": "gruppe_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "playbook_id": {
+          "name": "playbook_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "schritt_index": {
+          "name": "schritt_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sla_stunden": {
+          "name": "sla_stunden",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kosten_schaetzung_cent": {
+          "name": "kosten_schaetzung_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "faellig_am": {
+          "name": "faellig_am",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "erledigt_am": {
+          "name": "erledigt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "vorgaenge_status_idx": {
+          "name": "vorgaenge_status_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "faellig_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "vorgaenge_objekt_id_objekte_id_fk": {
+          "name": "vorgaenge_objekt_id_objekte_id_fk",
+          "tableFrom": "vorgaenge",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "vorgaenge_einheit_id_einheiten_id_fk": {
+          "name": "vorgaenge_einheit_id_einheiten_id_fk",
+          "tableFrom": "vorgaenge",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "vorgaenge_melder_id_personen_id_fk": {
+          "name": "vorgaenge_melder_id_personen_id_fk",
+          "tableFrom": "vorgaenge",
+          "tableTo": "personen",
+          "columnsFrom": [
+            "melder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "vorgaenge_bearbeiter_id_nutzer_id_fk": {
+          "name": "vorgaenge_bearbeiter_id_nutzer_id_fk",
+          "tableFrom": "vorgaenge",
+          "tableTo": "nutzer",
+          "columnsFrom": [
+            "bearbeiter_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "vorgaenge_mandant_id_nummer_unique": {
+          "name": "vorgaenge_mandant_id_nummer_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mandant_id",
+            "nummer"
+          ]
+        }
+      },
+      "policies": {
+        "vorgaenge_mandant": {
+          "name": "vorgaenge_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.vorschlaege": {
+      "name": "vorschlaege",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prozess": {
+          "name": "prozess",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kategorie": {
+          "name": "kategorie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorgang_id": {
+          "name": "vorgang_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titel": {
+          "name": "titel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kurzfassung": {
+          "name": "kurzfassung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "begruendung": {
+          "name": "begruendung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "belege": {
+          "name": "belege",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aktionen": {
+          "name": "aktionen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alternativen": {
+          "name": "alternativen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "risiko": {
+          "name": "risiko",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reversibel": {
+          "name": "reversibel",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "konfidenz": {
+          "name": "konfidenz",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "autonomiestufe": {
+          "name": "autonomiestufe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prioritaet": {
+          "name": "prioritaet",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        },
+        "zeitersparnis_minuten": {
+          "name": "zeitersparnis_minuten",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "vorlage_grund": {
+          "name": "vorlage_grund",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "vorschlag_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'offen'"
+        },
+        "ausfuehrung_am": {
+          "name": "ausfuehrung_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entscheiden_bis": {
+          "name": "entscheiden_bis",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "vorschlaege_offen_idx": {
+          "name": "vorschlaege_offen_idx",
+          "columns": [
+            {
+              "expression": "mandant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "prioritaet",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "vorschlaege_objekt_id_objekte_id_fk": {
+          "name": "vorschlaege_objekt_id_objekte_id_fk",
+          "tableFrom": "vorschlaege",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "vorschlaege_vorgang_id_vorgaenge_id_fk": {
+          "name": "vorschlaege_vorgang_id_vorgaenge_id_fk",
+          "tableFrom": "vorschlaege",
+          "tableTo": "vorgaenge",
+          "columnsFrom": [
+            "vorgang_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "vorschlaege_mandant": {
+          "name": "vorschlaege_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.zaehler": {
+      "name": "zaehler",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objekt_id": {
+          "name": "objekt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit_id": {
+          "name": "einheit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einheit": {
+          "name": "einheit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fernablesbar": {
+          "name": "fernablesbar",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "einbau": {
+          "name": "einbau",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eichung_bis": {
+          "name": "eichung_bis",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "zaehler_objekt_id_objekte_id_fk": {
+          "name": "zaehler_objekt_id_objekte_id_fk",
+          "tableFrom": "zaehler",
+          "tableTo": "objekte",
+          "columnsFrom": [
+            "objekt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "zaehler_einheit_id_einheiten_id_fk": {
+          "name": "zaehler_einheit_id_einheiten_id_fk",
+          "tableFrom": "zaehler",
+          "tableTo": "einheiten",
+          "columnsFrom": [
+            "einheit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "zaehler_objekt_id_nummer_unique": {
+          "name": "zaehler_objekt_id_nummer_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "objekt_id",
+            "nummer"
+          ]
+        }
+      },
+      "policies": {
+        "zaehler_mandant": {
+          "name": "zaehler_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.zaehlerstaende": {
+      "name": "zaehlerstaende",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zaehler_id": {
+          "name": "zaehler_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stichtag": {
+          "name": "stichtag",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stand": {
+          "name": "stand",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quelle": {
+          "name": "quelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'fern'"
+        },
+        "geschaetzt": {
+          "name": "geschaetzt",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "zaehlerstaende_zaehler_id_zaehler_id_fk": {
+          "name": "zaehlerstaende_zaehler_id_zaehler_id_fk",
+          "tableFrom": "zaehlerstaende",
+          "tableTo": "zaehler",
+          "columnsFrom": [
+            "zaehler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "zaehlerstaende_zaehler_id_stichtag_unique": {
+          "name": "zaehlerstaende_zaehler_id_stichtag_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "zaehler_id",
+            "stichtag"
+          ]
+        }
+      },
+      "policies": {
+        "zaehlerstaende_mandant": {
+          "name": "zaehlerstaende_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.zahlungszuordnungen": {
+      "name": "zahlungszuordnungen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mandant_id": {
+          "name": "mandant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "umsatz_id": {
+          "name": "umsatz_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sollstellung_id": {
+          "name": "sollstellung_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "betrag_cent": {
+          "name": "betrag_cent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quelle": {
+          "name": "quelle",
+          "type": "erfassungsart",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "zahlungszuordnungen_soll_idx": {
+          "name": "zahlungszuordnungen_soll_idx",
+          "columns": [
+            {
+              "expression": "sollstellung_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "zahlungszuordnungen_umsatz_id_kontoumsaetze_id_fk": {
+          "name": "zahlungszuordnungen_umsatz_id_kontoumsaetze_id_fk",
+          "tableFrom": "zahlungszuordnungen",
+          "tableTo": "kontoumsaetze",
+          "columnsFrom": [
+            "umsatz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "zahlungszuordnungen_sollstellung_id_sollstellungen_id_fk": {
+          "name": "zahlungszuordnungen_sollstellung_id_sollstellungen_id_fk",
+          "tableFrom": "zahlungszuordnungen",
+          "tableTo": "sollstellungen",
+          "columnsFrom": [
+            "sollstellung_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "zahlungszuordnungen_mandant": {
+          "name": "zahlungszuordnungen_mandant",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "mandant_id = current_setting('immos.mandant_id', true)::uuid",
+          "withCheck": "mandant_id = current_setting('immos.mandant_id', true)::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    }
+  },
+  "enums": {
+    "public.akteur_art": {
+      "name": "akteur_art",
+      "schema": "public",
+      "values": [
+        "mensch",
+        "agent",
+        "system",
+        "extern"
+      ]
+    },
+    "public.einheit_status": {
+      "name": "einheit_status",
+      "schema": "public",
+      "values": [
+        "vermietet",
+        "leerstand",
+        "eigennutzung",
+        "sanierung"
+      ]
+    },
+    "public.einheit_typ": {
+      "name": "einheit_typ",
+      "schema": "public",
+      "values": [
+        "wohnung",
+        "gewerbe",
+        "stellplatz",
+        "garage",
+        "keller",
+        "lager",
+        "dachboden"
+      ]
+    },
+    "public.erfassungsart": {
+      "name": "erfassungsart",
+      "schema": "public",
+      "values": [
+        "mensch",
+        "agent",
+        "system",
+        "import"
+      ]
+    },
+    "public.kontoart": {
+      "name": "kontoart",
+      "schema": "public",
+      "values": [
+        "ertrag",
+        "aufwand",
+        "forderung",
+        "verbindlichkeit",
+        "bank",
+        "kasse",
+        "ruecklage",
+        "kaution",
+        "abgrenzung",
+        "kapital"
+      ]
+    },
+    "public.person_rolle": {
+      "name": "person_rolle",
+      "schema": "public",
+      "values": [
+        "mieter",
+        "eigentuemer",
+        "beirat",
+        "dienstleister",
+        "versorger",
+        "versicherung",
+        "behoerde",
+        "bank",
+        "hausmeister",
+        "interessent",
+        "mitarbeiter"
+      ]
+    },
+    "public.person_typ": {
+      "name": "person_typ",
+      "schema": "public",
+      "values": [
+        "natuerlich",
+        "juristisch"
+      ]
+    },
+    "public.postfach_zweck": {
+      "name": "postfach_zweck",
+      "schema": "public",
+      "values": [
+        "rechnung",
+        "schaden",
+        "allgemein",
+        "versammlung",
+        "kuendigung",
+        "zaehler"
+      ]
+    },
+    "public.prioritaet": {
+      "name": "prioritaet",
+      "schema": "public",
+      "values": [
+        "notfall",
+        "hoch",
+        "normal",
+        "niedrig"
+      ]
+    },
+    "public.rechnung_status": {
+      "name": "rechnung_status",
+      "schema": "public",
+      "values": [
+        "eingegangen",
+        "geprueft",
+        "freigabe_erforderlich",
+        "freigegeben",
+        "zahlung_beauftragt",
+        "bezahlt",
+        "abgelehnt",
+        "reklamation"
+      ]
+    },
+    "public.soll_art": {
+      "name": "soll_art",
+      "schema": "public",
+      "values": [
+        "miete_kalt",
+        "bk_vorauszahlung",
+        "hk_vorauszahlung",
+        "stellplatz",
+        "hausgeld",
+        "ruecklage",
+        "sonderumlage",
+        "nachzahlung",
+        "mahngebuehr"
+      ]
+    },
+    "public.umlageschluessel": {
+      "name": "umlageschluessel",
+      "schema": "public",
+      "values": [
+        "wohnflaeche",
+        "personen",
+        "einheiten",
+        "mea",
+        "verbrauch_waerme",
+        "verbrauch_wasser",
+        "direktzuordnung",
+        "nicht_umlegen"
+      ]
+    },
+    "public.verwaltungsart": {
+      "name": "verwaltungsart",
+      "schema": "public",
+      "values": [
+        "miete",
+        "sev",
+        "weg",
+        "gewerbe"
+      ]
+    },
+    "public.vorgang_status": {
+      "name": "vorgang_status",
+      "schema": "public",
+      "values": [
+        "neu",
+        "in_pruefung",
+        "wartet_auf_entscheidung",
+        "beauftragt",
+        "wartet_extern",
+        "erledigt",
+        "abgelehnt"
+      ]
+    },
+    "public.vorschlag_status": {
+      "name": "vorschlag_status",
+      "schema": "public",
+      "values": [
+        "offen",
+        "zugestimmt",
+        "abgelehnt",
+        "geaendert_zugestimmt",
+        "automatisch_ausgefuehrt",
+        "abgelaufen",
+        "eskaliert"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -1,11 +1,20 @@
-import { defineConfig } from "drizzle-kit";
+import type { Config } from "drizzle-kit";
 
-export default defineConfig({
+/**
+ * Migrationen werden erzeugt, nicht handgeschrieben:
+ *   npx drizzle-kit generate
+ * Anschließend `src/db/policies.sql` an die erste Migration anhängen — Trigger,
+ * Ausschluss-Constraints und erzwungene Row Level Security stehen dort.
+ */
+export default {
+  schema: "./src/db/schema.ts",
+  out: "./drizzle",
   dialect: "postgresql",
-  schema: "./src/db/schema/index.ts",
-  out: "./src/db/migrations",
-  // Rollen werden in 0001_guards.sql angelegt, nicht von drizzle-kit verwaltet.
-  entities: { roles: { provider: "", exclude: ["immos_app", "immos_dienst", "immos_owner"] } },
+  dbCredentials: {
+    url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/immos",
+  },
   verbose: true,
   strict: true,
-});
+  // Policies stehen im Schema, sollen aber von drizzle-kit verwaltet werden.
+  entities: { roles: { provider: "" } },
+} satisfies Config;
