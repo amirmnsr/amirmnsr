@@ -934,3 +934,125 @@ export const beschluesse: Beschluss[] = [
     umsetzungStatus: "umgesetzt",
   },
 ];
+
+/**
+ * Eigentümerversammlung (Modul WEG)
+ * ---------------------------------------------------------------------------
+ * Die Tagesordnung enthält bewusst zwei Fallen, die in der Praxis Beschlüsse
+ * angreifbar machen: einen als Baubeschluss formulierten Antrag ohne
+ * Kostenverteilungsbeschluss und eine Beauftragung ohne Deckung im
+ * Wirtschaftsplan. Der Beschluss-Prüfer markiert beides.
+ */
+export interface Tagesordnungspunkt {
+  nummer: number;
+  titel: string;
+  art: "bericht" | "beschluss" | "wahl" | "information";
+  beschlussvorschlag?: string;
+  /** Vom Beschluss-Prüfer erkanntes Risiko. */
+  risiko?: string;
+  erforderlicheMehrheit: "einfach" | "qualifiziert" | "allstimmig" | "—";
+  budgetCent?: number;
+}
+
+export interface Versammlung {
+  id: string;
+  objektId: string;
+  termin: string;
+  ort: string;
+  art: "praesenz" | "hybrid" | "virtuell";
+  einladungBis: IsoDateLike;
+  status: "planung" | "eingeladen" | "durchgefuehrt" | "protokolliert";
+  eigentuemerAnzahl: number;
+  vollmachtenErhalten: number;
+  ruecklaufEinladung: number;
+  tagesordnung: Tagesordnungspunkt[];
+}
+
+type IsoDateLike = string;
+
+export const versammlungen: Versammlung[] = [
+  {
+    id: "vsg-1088-2026",
+    objektId: "obj-1088",
+    termin: "2026-09-24T18:00:00+02:00",
+    ort: "Bürgerhaus Sülz, Saal 2, Köln",
+    art: "hybrid",
+    einladungBis: "2026-09-02",
+    status: "planung",
+    eigentuemerAnzahl: 28,
+    vollmachtenErhalten: 6,
+    ruecklaufEinladung: 0,
+    tagesordnung: [
+      {
+        nummer: 1,
+        titel: "Begrüßung, Feststellung der Beschlussfähigkeit, Stimmkraftprüfung",
+        art: "bericht",
+        erforderlicheMehrheit: "—",
+      },
+      {
+        nummer: 2,
+        titel: "Jahresabrechnung 2025 und Beschluss über Nachschüsse bzw. Anpassung der Vorschüsse",
+        art: "beschluss",
+        beschlussvorschlag:
+          "Über die Nachschüsse und die Anpassung der beschlossenen Vorschüsse gemäß Jahresabrechnung 2025 wird beschlossen. Gesamtergebnis: 22.141,00 € Nachschüsse, 8.843,00 € Guthaben.",
+        erforderlicheMehrheit: "einfach",
+      },
+      {
+        nummer: 3,
+        titel: "Vermögensbericht 2025 zur Kenntnis",
+        art: "information",
+        erforderlicheMehrheit: "—",
+      },
+      {
+        nummer: 4,
+        titel: "Wirtschaftsplan 2027 und Vorschüsse",
+        art: "beschluss",
+        beschlussvorschlag:
+          "Der Wirtschaftsplan 2027 mit einem Gesamtvolumen von 228.400 € wird beschlossen. Die Vorschüsse gelten bis zum Beschluss eines neuen Wirtschaftsplans fort.",
+        erforderlicheMehrheit: "einfach",
+        budgetCent: 22840000,
+      },
+      {
+        nummer: 5,
+        titel: "Statusbericht Dachsanierung (Beschluss 2025-04), Bauabschnitt 2",
+        art: "bericht",
+        erforderlicheMehrheit: "—",
+      },
+      {
+        nummer: 6,
+        titel: "Antrag des Verwaltungsbeirats: Prüfung einer Photovoltaikanlage",
+        art: "beschluss",
+        beschlussvorschlag:
+          "Die Verwaltung wird beauftragt, für eine Photovoltaikanlage auf dem Flachdach zwei Angebote sowie eine Wirtschaftlichkeitsberechnung einzuholen und in der nächsten Versammlung vorzulegen. Kosten der Vorprüfung bis 3.500 €, Deckung aus der Erhaltungsrücklage.",
+        risiko:
+          "Als Prüfauftrag formuliert und damit unkritisch. Würde bereits die Errichtung beschlossen, wäre zugleich über die Kostenverteilung zu beschließen — sonst ist der Beschluss anfechtbar.",
+        erforderlicheMehrheit: "einfach",
+        budgetCent: 350000,
+      },
+      {
+        nummer: 7,
+        titel: "Austausch der Hauseingangstür (Antrag einer Eigentümerin)",
+        art: "beschluss",
+        beschlussvorschlag:
+          "Der Austausch der Hauseingangstür gemäß Angebot vom 12.06.2026 über 14.800 € wird beschlossen, finanziert aus der Erhaltungsrücklage.",
+        risiko:
+          "Im Wirtschaftsplan 2026 nicht vorgesehen. Ohne Sonderumlage oder ausreichende Rücklage fehlt die Finanzierungsgrundlage — Rücklagenstand vor Beschlussfassung feststellen.",
+        erforderlicheMehrheit: "einfach",
+        budgetCent: 1480000,
+      },
+      {
+        nummer: 8,
+        titel: "Entlastung von Verwaltung und Verwaltungsbeirat",
+        art: "beschluss",
+        beschlussvorschlag: "Verwaltung und Verwaltungsbeirat werden für das Jahr 2025 entlastet.",
+        erforderlicheMehrheit: "einfach",
+      },
+      {
+        nummer: 9,
+        titel: "Verschiedenes",
+        art: "information",
+        erforderlicheMehrheit: "—",
+      },
+    ],
+  },
+];

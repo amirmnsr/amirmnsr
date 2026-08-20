@@ -9,6 +9,12 @@
 
 import type { Objekt, Vorschlag } from "@/domain";
 import { MODULE_MAP, defaultModuleConfig, type ModuleConfig, type ModuleId } from "@/domain/modules";
+import {
+  berechneAbrechnung,
+  type KostenpositionInput,
+  type UmlageEinheit,
+  type UmlageNutzung,
+} from "@/domain/accounting/betriebskosten";
 import { HEUTE, JETZT } from "./seed/basis";
 import {
   bankkonten,
@@ -43,6 +49,7 @@ import {
   fristen,
   nachrichten,
   pruefpflichten,
+  versammlungen,
   vorgaenge,
 } from "./seed/betrieb";
 import { agentLaeufe, agenten, autonomieRegeln } from "./seed/agenten";
@@ -321,6 +328,178 @@ export async function getAbrechnung() {
   };
 }
 
+/**
+ * Betriebskostenabrechnung eines Objekts — gerechnet mit der echten Engine.
+ *
+ * Wichtig für die Demo und später für den Betrieb: Die Zahlen dieser Seite sind
+ * nicht hinterlegt, sie entstehen bei jedem Aufruf aus Kostenpositionen,
+ * Flächen, Personen, Verbräuchen und Nutzungszeiträumen. Deshalb stimmt der
+ * angezeigte Rechenweg immer mit dem Ergebnis überein.
+ */
+export async function getAbrechnungsLauf(objektId: string, jahr: number) {
+  const objekt = objekte.find((o) => o.id === objektId);
+  const lauf = abrechnungslaeufe.find((a) => a.objektId === objektId && a.jahr === jahr);
+  if (!objekt || !lauf) return null;
+
+  const von = `${jahr}-01-01`;
+  const bis = `${jahr}-12-31`;
+  const objektEinheiten = einheiten.filter((e) => e.objektId === objektId);
+
+  const umlageEinheiten: UmlageEinheit[] = objektEinheiten.map((e) => ({
+    einheitId: e.id,
+    bezeichnung: `WE ${e.nummer} · ${e.lage}`,
+    flaecheM2: e.wohnflaecheM2,
+    meaTausendstel: e.meaTausendstel,
+    gewerbe: e.typ === "gewerbe",
+  }));
+
+  // Nutzungszeitscheiben: im Regelfall das ganze Jahr, dazu ein Mieterwechsel
+  // zur Jahresmitte und ein Leerstand ab November — die beiden Fälle, an denen
+  // sich zeigt, ob eine Abrechnung richtig rechnet.
+  const nutzungen: UmlageNutzung[] = [];
+  for (const [i, e] of objektEinheiten.entries()) {
+    const vertrag = vertraege.find((v) => v.einheitId === e.id);
+    const mieter = vertrag ? personen.find((p) => p.id === vertrag.mieterIds[0])?.name : undefined;
+    // Vorauszahlungen liegen in der Praxis leicht unter den tatsächlichen Kosten —
+    // deshalb gibt es überhaupt Nachzahlungen. Faktor bewusst unter 1.
+    const vorauszahlungJahr = Math.round(
+      ((vertrag?.bkVorauszahlungCent ?? 0) + (vertrag?.hkVorauszahlungCent ?? 0)) * 12 * 0.82,
+    );
+    const verbrauchWaerme = 2600 + ((i * 811) % 5200);
+    const verbrauchWasser = 28 + ((i * 37) % 62);
+
+    const wechsel = e.nummer === "18";
+    const leerstandAbNovember = e.nummer === "11";
+
+    if (wechsel) {
+      nutzungen.push(
+        {
+          nutzungId: `${e.id}-a`,
+          einheitId: e.id,
+          nutzerName: `${mieter ?? "Mieter"} (bis 30.06.)`,
+          von,
+          bis: `${jahr}-06-30`,
+          personen: e.personenzahl || 1,
+          vorauszahlungCent: Math.round(vorauszahlungJahr / 2),
+          verbrauchWaermeKwh: Math.round(verbrauchWaerme * 0.62),
+          verbrauchKaltwasserM3: Math.round(verbrauchWasser * 0.5),
+        },
+        {
+          nutzungId: `${e.id}-b`,
+          einheitId: e.id,
+          nutzerName: "Nachmieter (ab 01.07.)",
+          von: `${jahr}-07-01`,
+          bis,
+          personen: 2,
+          vorauszahlungCent: Math.round(vorauszahlungJahr / 2),
+          verbrauchWaermeKwh: Math.round(verbrauchWaerme * 0.38),
+          verbrauchKaltwasserM3: Math.round(verbrauchWasser * 0.5),
+        },
+      );
+      continue;
+    }
+
+    if (leerstandAbNovember) {
+      nutzungen.push(
+        {
+          nutzungId: `${e.id}-a`,
+          einheitId: e.id,
+          nutzerName: `${mieter ?? "Mieter"} (bis 31.10.)`,
+          von,
+          bis: `${jahr}-10-31`,
+          personen: e.personenzahl || 1,
+          vorauszahlungCent: Math.round((vorauszahlungJahr / 12) * 10),
+          verbrauchWaermeKwh: Math.round(verbrauchWaerme * 0.8),
+          verbrauchKaltwasserM3: Math.round(verbrauchWasser * 0.85),
+        },
+        {
+          nutzungId: `${e.id}-leer`,
+          einheitId: e.id,
+          nutzerName: "Leerstand (Eigentümer)",
+          von: `${jahr}-11-01`,
+          bis,
+          personen: 0,
+          vorauszahlungCent: 0,
+          leerstand: true,
+          verbrauchWaermeKwh: Math.round(verbrauchWaerme * 0.2),
+          verbrauchKaltwasserM3: Math.round(verbrauchWasser * 0.15),
+        },
+      );
+      continue;
+    }
+
+    nutzungen.push({
+      nutzungId: `${e.id}-a`,
+      einheitId: e.id,
+      nutzerName: mieter ?? `Nutzer WE ${e.nummer}`,
+      von,
+      bis,
+      personen: e.personenzahl || 1,
+      vorauszahlungCent: vorauszahlungJahr,
+      verbrauchWaermeKwh: verbrauchWaerme,
+      verbrauchKaltwasserM3: verbrauchWasser,
+    });
+  }
+
+  const positionen: KostenpositionInput[] = kostenpositionen2025
+    .filter((k) => k.objektId === objektId && k.jahr === jahr)
+    .map((k) => ({
+      id: k.id,
+      kontoNr: k.kontoNr,
+      bezeichnung: k.bezeichnung,
+      betragCent: k.betragCent,
+      umlagefaehig: k.umlagefaehig,
+      schluessel: k.schluessel,
+      vorwegabzugCent: k.vorwegabzugCent,
+      paragraf35aCent: k.paragraf35aCent,
+      betrkv: kontenrahmen.find((konto) => konto.nummer === k.kontoNr)?.betrkv,
+      // Heizung: HeizkostenV-Aufteilung und CO₂-Anteil aus dem Energiebezug.
+      heizkosten: k.kontoNr === "4300",
+      co2KostenCent: k.kontoNr === "4300" ? Math.round(k.betragCent * 0.087) : undefined,
+      belegIds: k.belegIds,
+    }));
+
+  const ergebnis = berechneAbrechnung(
+    {
+      objektId,
+      jahr,
+      von,
+      bis,
+      einheiten: umlageEinheiten,
+      nutzungen,
+      heizkosten: {
+        // 70/30 ist der in der Praxis übliche und nach HeizkostenV zulässige Schlüssel.
+        verbrauchsanteil: 0.7,
+        co2EmissionKgProM2: 35,
+      },
+    },
+    positionen,
+  );
+
+  // Kennzahlen des Laufs aus dem Rechenergebnis übernehmen, damit Übersicht und
+  // Detail nie auseinanderlaufen.
+  const nachzahlungen = ergebnis.nutzungen
+    .filter((n) => n.saldoCent > 0)
+    .reduce((s, n) => s + n.saldoCent, 0);
+  const guthaben = ergebnis.nutzungen
+    .filter((n) => n.saldoCent < 0)
+    .reduce((s, n) => s + n.saldoCent, 0);
+
+  return {
+    lauf: {
+      ...lauf,
+      gesamtkostenCent: ergebnis.gesamtkostenCent,
+      umlagefaehigCent: ergebnis.umgelegtCent,
+      nachzahlungenCent: nachzahlungen,
+      guthabenCent: guthaben,
+    },
+    objekt,
+    ergebnis,
+    positionen,
+    einheitenAnzahl: objektEinheiten.length,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Technik, Fristen, Automation
 // ---------------------------------------------------------------------------
@@ -334,6 +513,36 @@ export async function getTechnik() {
     auftraege,
     objektNamen: Object.fromEntries(objekte.map((o) => [o.id, `${o.nummer} · ${o.bezeichnung}`])),
     dienstleisterNamen: Object.fromEntries(personen.map((p) => [p.id, p.name])),
+  };
+}
+
+export async function getVersammlung(objektId?: string) {
+  const versammlung = objektId
+    ? versammlungen.find((v) => v.objektId === objektId)
+    : versammlungen[0];
+  if (!versammlung) return null;
+
+  const objekt = objekte.find((o) => o.id === versammlung.objektId);
+  const wegEinheiten = einheiten.filter((e) => e.objektId === versammlung.objektId);
+  const stimmen = wegEinheiten.map((e) => {
+    const verhaeltnis = eigentumsverhaeltnisse.find((ev) => ev.einheitId === e.id);
+    const eigentuemer = personen.find((p) => p.id === verhaeltnis?.eigentuemerId);
+    return {
+      einheitId: e.id,
+      bezeichnung: `WE ${e.nummer} · ${e.lage}`,
+      eigentuemer: eigentuemer?.name ?? "unbekannt",
+      meaTausendstel: e.meaTausendstel ?? 0,
+      selbstnutzer: verhaeltnis?.selbstnutzer ?? false,
+    };
+  });
+
+  return {
+    versammlung,
+    objekt,
+    stimmen,
+    meaSumme: stimmen.reduce((s, x) => s + x.meaTausendstel, 0),
+    beschluesse: beschluesse.filter((b) => b.objektId === versammlung.objektId),
+    frist: fristen.find((f) => f.objektId === versammlung.objektId && f.art === "gesetzlich"),
   };
 }
 

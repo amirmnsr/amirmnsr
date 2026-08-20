@@ -51,26 +51,42 @@ export function formatArea(m2: number): string {
   return `${formatNumber(m2, 2)} m²`;
 }
 
+/**
+ * Alle Datums- und Zeitangaben in Europe/Berlin. Eine deutsche Verwaltung
+ * arbeitet in deutscher Zeit — unabhängig davon, in welcher Zeitzone der
+ * Browser des Betrachters steht. Sonst wäre eine Frist "morgen 00:00" je
+ * Standort eine andere.
+ */
+const ZEITZONE = "Europe/Berlin";
+
 export function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeZone: ZEITZONE }).format(
+    new Date(iso),
+  );
 }
 
 export function formatDateShort(iso: string): string {
-  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" }).format(
-    new Date(iso),
-  );
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: ZEITZONE,
+  }).format(new Date(iso));
 }
 
 export function formatDateTime(iso: string): string {
-  return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(iso),
-  );
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: ZEITZONE,
+  }).format(new Date(iso));
 }
 
 export function formatTime(iso: string): string {
-  return new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" }).format(
-    new Date(iso),
-  );
+  return new Intl.DateTimeFormat("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: ZEITZONE,
+  }).format(new Date(iso));
 }
 
 /** "vor 3 Min.", "in 2 Tagen" — relativ zu einem übergebenen Bezugszeitpunkt (SSR-stabil). */
@@ -126,4 +142,26 @@ export function initials(name: string): string {
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase() ?? "")
     .join("");
+}
+
+/** Stunde in deutscher Zeit — Grundlage für Begrüßung und Tagesabschnitt. */
+export function stundeBerlin(iso: string): number {
+  const teil = new Intl.DateTimeFormat("de-DE", {
+    hour: "numeric",
+    hourCycle: "h23",
+    timeZone: ZEITZONE,
+  })
+    .formatToParts(new Date(iso))
+    .find((t) => t.type === "hour");
+  return Number(teil?.value ?? 0);
+}
+
+export function formatWochentag(iso: string): string {
+  return new Intl.DateTimeFormat("de-DE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: ZEITZONE,
+  }).format(new Date(iso));
 }

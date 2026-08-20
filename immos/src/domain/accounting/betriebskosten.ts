@@ -214,7 +214,6 @@ function gewichte(
   schluessel: UmlageschluesselId,
   kontext: AbrechnungskontextInput,
 ): BezugsGewicht[] {
-  const gesamtTage = tageImZeitraum(kontext.von, kontext.bis);
   const einheitMap = new Map(kontext.einheiten.map((e) => [e.einheitId, e]));
 
   return kontext.nutzungen.map((n) => {
