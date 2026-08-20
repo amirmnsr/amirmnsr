@@ -13,7 +13,7 @@ const ausgabe = process.env.AUSGABE ?? "./.screenshots";
 const breite = Number(process.env.BREITE ?? 1600);
 const hoehe = Number(process.env.HOEHE ?? 1000);
 const ganzeSeite = process.env.GANZ === "1";
-const thema = process.env.THEMA ?? "dark";
+const thema = process.env.THEMA ?? "light";
 
 await mkdir(ausgabe, { recursive: true });
 
@@ -37,7 +37,7 @@ seite.on("pageerror", (e) => fehler.push(`pageerror: ${e.message}`));
 for (const ziel of ziele) {
   const [pfad, name = pfad.replace(/\W+/g, "_")] = ziel.split("::");
   await seite.goto(`http://localhost:3000${pfad}`, { waitUntil: "networkidle", timeout: 45000 });
-  if (thema !== "dark") {
+  if (thema !== "light") {
     await seite.evaluate((t) => {
       document.documentElement.dataset.theme = t;
     }, thema);

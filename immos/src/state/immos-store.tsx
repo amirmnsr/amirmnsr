@@ -189,7 +189,7 @@ export function ImmosProvider({
       moduleConfig,
       autonomie,
       chat,
-      theme: "dark",
+      theme: "light",
       dichte: "normal",
       gespartMinuten: 0,
       entschiedenAnzahl: 0,

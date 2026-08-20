@@ -7,6 +7,9 @@ npm run build && npm start     # stabiler als dev für einen Termin
 http://localhost:3000/hallo?name=Thomas
 ```
 
+Die Oberfläche startet im hellen Büro-Theme; die dunkle Cockpit-Variante liegt
+oben rechts auf dem Mond-Symbol, falls der Raum dunkel ist.
+
 Chromium oder Chrome verwenden — nur dort funktioniert die Spracherkennung.
 Mikrofon einmal freigeben, Ton an. Bezugszeitpunkt der Demo ist fest:
 **Donnerstag, 20.08.2026, 08:42 Uhr**, damit jede Zahl reproduzierbar ist.

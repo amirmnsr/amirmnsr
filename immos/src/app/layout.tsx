@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f8fb" },
     { media: "(prefers-color-scheme: dark)", color: "#05070b" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f6fa" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="de" data-theme="dark" className={`${sans.variable} ${mono.variable} h-full`}>
+    <html lang="de" data-theme="light" className={`${sans.variable} ${mono.variable} h-full`}>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

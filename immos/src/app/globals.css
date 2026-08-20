@@ -2,15 +2,59 @@
 
 /* ==========================================================================
    ImmOS Design Tokens
-   Dunkles Cockpit als Standard, helles Büro-Theme über [data-theme="light"].
-   Regel: ein Akzentton (Ice/Cyan) trägt Interaktion und Fokus, alles andere
-   ist neutral. Semantische Farben nur für Status, nie für Dekoration.
+   Helles Büro-Theme ist der Standard, das dunkle Cockpit die Variante über
+   [data-theme="dark"]. Regel: ein Akzentton (Petrol) trägt Interaktion und
+   Fokus, alles andere ist neutral. Semantische Farben nur für Status, nie für
+   Dekoration.
    ========================================================================== */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Flächen */
+  --bg: #f6f8fb;
+  --bg-deep: #e8edf4;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #eef2f7;
+  --elevated: #ffffff;
+  --line: #e1e7ef;
+  --line-strong: #c7d1de;
+
+  /* Text */
+  --fg: #0f172a;
+  --fg-muted: #45505f;
+  --fg-subtle: #5f6b7a;
+  --fg-inverse: #ffffff;
+
+  /* Akzent */
+  --accent: #0d8285;
+  --accent-strong: #0a6b6e;
+  --accent-dim: #a5e3e2;
+  --accent-wash: rgba(13, 130, 133, 0.09);
+  --accent-line: rgba(13, 130, 133, 0.32);
+
+  /* Status */
+  --ok: #157f3d;
+  --ok-wash: rgba(21, 127, 61, 0.1);
+  --warn: #a55405;
+  --warn-wash: rgba(165, 84, 5, 0.1);
+  --danger: #be123c;
+  --danger-wash: rgba(190, 18, 60, 0.09);
+  --info: #0369a1;
+  --info-wash: rgba(3, 105, 161, 0.09);
+  --agent: #6d28d9;
+  --agent-wash: rgba(109, 40, 217, 0.09);
+
+  /* Effekte */
+  --glow: 0 0 0 1px var(--accent-line), 0 0 24px -10px rgba(13, 130, 133, 0.4);
+  --shadow-card: 0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 8px 24px -18px rgba(15, 23, 42, 0.22);
+  --grid-line: rgba(15, 23, 42, 0.032);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
   --bg: #05070b;
   --bg-deep: #030407;
   --surface: #0a0e16;
@@ -20,20 +64,17 @@
   --line: #1e2635;
   --line-strong: #2b3547;
 
-  /* Text */
   --fg: #e8edf6;
   --fg-muted: #93a1b8;
-  --fg-subtle: #616e85;
+  --fg-subtle: #7d8ba3;
   --fg-inverse: #05070b;
 
-  /* Akzent */
   --accent: #3ddbd9;
   --accent-strong: #6ff0ee;
   --accent-dim: #1b6f74;
   --accent-wash: rgba(61, 219, 217, 0.1);
   --accent-line: rgba(61, 219, 217, 0.32);
 
-  /* Status */
   --ok: #4ade80;
   --ok-wash: rgba(74, 222, 128, 0.12);
   --warn: #fbbf24;
@@ -45,49 +86,9 @@
   --agent: #c4b5fd;
   --agent-wash: rgba(196, 181, 253, 0.12);
 
-  /* Effekte */
   --glow: 0 0 0 1px var(--accent-line), 0 0 32px -8px rgba(61, 219, 217, 0.45);
   --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -18px rgba(0, 0, 0, 0.9);
   --grid-line: rgba(255, 255, 255, 0.028);
-}
-
-[data-theme="light"] {
-  color-scheme: light;
-
-  --bg: #f4f6fa;
-  --bg-deep: #e9edf4;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --surface-3: #f1f5f9;
-  --elevated: #ffffff;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
-
-  --fg: #0f172a;
-  --fg-muted: #4a5568;
-  --fg-subtle: #75818f;
-  --fg-inverse: #ffffff;
-
-  --accent: #0e8f92;
-  --accent-strong: #0b7376;
-  --accent-dim: #a5e8e7;
-  --accent-wash: rgba(14, 143, 146, 0.08);
-  --accent-line: rgba(14, 143, 146, 0.3);
-
-  --ok: #15803d;
-  --ok-wash: rgba(21, 128, 61, 0.1);
-  --warn: #b45309;
-  --warn-wash: rgba(180, 83, 9, 0.1);
-  --danger: #be123c;
-  --danger-wash: rgba(190, 18, 60, 0.1);
-  --info: #0369a1;
-  --info-wash: rgba(3, 105, 161, 0.1);
-  --agent: #6d28d9;
-  --agent-wash: rgba(109, 40, 217, 0.1);
-
-  --glow: 0 0 0 1px var(--accent-line), 0 0 24px -10px rgba(14, 143, 146, 0.4);
-  --shadow-card: 0 1px 2px 0 rgba(15, 23, 42, 0.06), 0 8px 24px -16px rgba(15, 23, 42, 0.24);
-  --grid-line: rgba(15, 23, 42, 0.035);
 }
 
 @theme inline {
